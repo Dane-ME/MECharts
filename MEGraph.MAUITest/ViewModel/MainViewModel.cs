@@ -19,7 +19,8 @@ namespace MEGraph.MAUITest.ViewModel
             ChartData = new ObservableCollection<float> { 10, 30, 15, 50, 40, 60, 100, 0, 50 };
             ChartAxes = new ObservableCollection<IAxis>
             {
-                new ValueAxis { Title = "Y Axis" }
+                new ValueAxis { Title = "Y Axis" },
+                new CategoryAxis { Title = "X Axis", Labels = new List<string> { "A", "B", "C", "D", "E", "F", "G", "H", "I" } }
             };
         }
     }

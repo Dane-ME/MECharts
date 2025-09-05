@@ -31,15 +31,13 @@ namespace MEGraph.MAUI.Axes
 
             if (Labels?.Any() == true)
             {
-                float step = plotArea.Width / Labels.Count;
-                float x = plotArea.Left + step / 2;
-
-                foreach (var label in Labels)
+                float stepX = plotArea.Width / (Labels.Count - 1); // đồng bộ với Data
+                for (int i = 0; i < Labels.Count; i++)
                 {
+                    float x = plotArea.Left + i * stepX;
                     canvas.FontSize = 12;
                     canvas.FontColor = Colors.Black;
-                    canvas.DrawString(label, x, labelArea.Center.Y, HorizontalAlignment.Center);
-                    x += step;
+                    canvas.DrawString(Labels[i], x, labelArea.Center.Y, HorizontalAlignment.Center);
                 }
             }
 

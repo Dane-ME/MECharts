@@ -16,5 +16,6 @@
     <charts:LineChart 
         x:Name="lineChart"
         Data="{Binding ChartData}"
+        Axes="{Binding ChartAxes}"
         />
 </ContentPage>

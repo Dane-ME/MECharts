@@ -9,8 +9,8 @@ namespace MEGraph.MAUI.Series
     {
         public string Name { get; set; } = "LineSeries";
         public List<float> Data { get; set; } = new();
-        public Color StrokeColor { get; set; } = Colors.Blue;
-        public float StrokeWidth { get; set; } = 2f;
+        public Color StrokeColor { get; set; } = Color.FromArgb("#5B9BD5");
+        public float StrokeWidth { get; set; } = 3f;
 
         /// <summary>
         /// Vẽ series trong plotArea (không đè lên Title, Axis).
