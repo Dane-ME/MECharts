@@ -1,33 +1,36 @@
-﻿using System;
+﻿using MEGraph.MAUI.Charts;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MEGraph.MAUI.Series
 {
     public class LineSeries : ISeries
     {
         public string Name { get; set; } = "LineSeries";
-        public List<float> Data { get; set; } = new ();
+        public List<float> Data { get; set; } = new();
         public Color StrokeColor { get; set; } = Colors.Blue;
         public float StrokeWidth { get; set; } = 2f;
 
-        public void Draw(ICanvas canvas, RectF dirtyRect)
+        /// <summary>
+        /// Vẽ series trong plotArea (không đè lên Title, Axis).
+        /// </summary>
+        public void Draw(ICanvas canvas, RectF plotArea)
         {
             if (Data == null || Data.Count < 2) return;
 
-            float stepX = dirtyRect.Width / (Data.Count - 1);
+            float stepX = plotArea.Width / (Data.Count - 1);
             float maxY = Data.Max();
             float minY = Data.Min();
+            float rangeY = (maxY - minY == 0) ? 1 : maxY - minY;
 
             for (int i = 0; i < Data.Count - 1; i++)
             {
-                float x1 = i * stepX;
-                float y1 = dirtyRect.Height - ((Data[i] - minY) / (maxY - minY) * dirtyRect.Height);
+                float x1 = plotArea.Left + (i * stepX);
+                float y1 = plotArea.Bottom - ((Data[i] - minY) / rangeY * plotArea.Height);
 
-                float x2 = (i + 1) * stepX;
-                float y2 = dirtyRect.Height - ((Data[i + 1] - minY) / (maxY - minY) * dirtyRect.Height);
+                float x2 = plotArea.Left + ((i + 1) * stepX);
+                float y2 = plotArea.Bottom - ((Data[i + 1] - minY) / rangeY * plotArea.Height);
 
                 canvas.StrokeColor = StrokeColor;
                 canvas.StrokeSize = StrokeWidth;

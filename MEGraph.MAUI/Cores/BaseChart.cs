@@ -3,25 +3,101 @@ using MEGraph.MAUI.Legends;
 using MEGraph.MAUI.Series;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace MEGraph.MAUI.Cores
 {
-    public abstract class BaseChart : GraphicsView
+    public abstract class BaseChart : GraphicsView, IDisposable
     {
+        private ChartDrawable _drawable;
         public List<ISeries> Series { get; } = new();
-        //public List<IAxis> Axes { get; } = new();
-        //public ILegend Legend { get; set; }
-        //public ChartOptions Options { get; set; } = new ChartOptions();
-        public string Title { get; set; }
-
-        protected BaseChart()
+        public Thickness ChartPadding { get; set; } = new Thickness(50, 40, 20, 30);
+        public ObservableCollection<IAxis> Axes
         {
-            Drawable = new ChartDrawable(this);
+            get => (ObservableCollection<IAxis>)GetValue(AxesProperty);
+            set => SetValue(AxesProperty, value);
+        }
+        public ILegend Legend
+        {
+            get => (ILegend)GetValue(LegendProperty);
+            set => SetValue(LegendProperty, value);
+        }
+        //public ChartOptions Options { get; set; } = new ChartOptions();
+        public string Title
+        {
+            get => (string)GetValue(TitleProperty);
+            set => SetValue(TitleProperty, value);
+        }
+
+        public BaseChart()
+        {
+            _drawable = new ChartDrawable(this);
+            Drawable = _drawable;
+            Unloaded += (s, e) => Dispose();
+
+            Title = "Chart Title";
+            Axes = new ObservableCollection<IAxis>
+            {
+                new ValueAxis { Title = "Revenue", Orientation = AxisOrientation.Y },
+                new CategoryAxis { Title = "Months", Orientation = AxisOrientation.X, Labels = new List<string> { "Jan", "Feb", "Mar", "Apr" } }
+            };
         }
 
         public void Refresh() => this.Invalidate();
+
+        public static readonly BindableProperty TitleProperty =
+        BindableProperty.Create(
+        nameof(Title),
+        typeof(string),
+        typeof(BaseChart),
+        default(string),
+        propertyChanged: (bindable, oldValue, newValue) =>
+        {
+            ((BaseChart)bindable).Refresh();
+        });
+
+        public static readonly BindableProperty LegendProperty =
+        BindableProperty.Create(
+        nameof(Legend),
+        typeof(ILegend),
+        typeof(BaseChart),
+        default(ILegend),
+        propertyChanged: (bindable, oldValue, newValue) =>
+        {
+            ((BaseChart)bindable).Refresh();
+        });
+
+        public static readonly BindableProperty AxesProperty =
+        BindableProperty.Create(
+        nameof(Axes),
+        typeof(ObservableCollection<IAxis>),
+        typeof(BaseChart),
+        new ObservableCollection<IAxis>(),
+        propertyChanged: OnAxesChanged);
+
+        private static void OnAxesChanged(BindableObject bindable, object oldValue, object newValue)
+        {
+            var chart = (BaseChart)bindable;
+
+            if (oldValue is ObservableCollection<IAxis> oldAxes)
+                oldAxes.CollectionChanged -= (_, __) => chart.Refresh();
+
+            if (newValue is ObservableCollection<IAxis> newAxes)
+                newAxes.CollectionChanged += (_, __) => chart.Refresh();
+
+            chart.Refresh();
+        }
+
+        public void Dispose()
+        {
+            if (_drawable != null)
+            {
+                _drawable.Dispose();
+                Drawable = null;
+            }
+        }
     }
 }

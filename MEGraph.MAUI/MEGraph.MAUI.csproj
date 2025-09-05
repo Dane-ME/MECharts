@@ -24,6 +24,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Folder Include="Image\" />
 	  <Folder Include="Theme\" />
 	</ItemGroup>
 

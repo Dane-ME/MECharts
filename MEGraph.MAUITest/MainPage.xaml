@@ -2,9 +2,19 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:charts="clr-namespace:MEGraph.MAUI.Charts;assembly=MEGraph.MAUI"
+             xmlns:viewmodel="clr-namespace:MEGraph.MAUITest.ViewModel;assembly=MEGraph.MAUITest"
              x:Class="MEGraph.MAUITest.MainPage">
-
-    <charts:LineChart x:Name="lineChart"
-                          HeightRequest="300"
-                          WidthRequest="350"/>
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <viewmodel:MainViewModel x:Key="MainViewModel"/>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <ContentPage.BindingContext>
+        <StaticResource Key="MainViewModel"/>
+    </ContentPage.BindingContext>
+    
+    <charts:LineChart 
+        x:Name="lineChart"
+        Data="{Binding ChartData}"
+        />
 </ContentPage>
