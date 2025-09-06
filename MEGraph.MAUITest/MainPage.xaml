@@ -15,7 +15,7 @@
     
     <charts:LineChart 
         x:Name="lineChart"
-        Data="{Binding ChartData}"
+        SeriesItems="{Binding MySeries}"
         Axes="{Binding ChartAxes}"
         />
 </ContentPage>

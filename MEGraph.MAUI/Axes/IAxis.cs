@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MEGraph.MAUI.Styles;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,8 +14,10 @@ namespace MEGraph.MAUI.Axes
     }
     public interface IAxis
     {
-        string Title { get; set; }
+        AxisTitle Title { get; set; }
+        List<AxisLabel> Labels { get; set; }
         AxisOrientation Orientation { get; set; }
+        Color StrokeColor { get; set; }
         void Draw(ICanvas canvas, RectF outerArea, RectF plotArea);
     }
 }

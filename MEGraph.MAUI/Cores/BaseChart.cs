@@ -1,6 +1,7 @@
 ﻿using MEGraph.MAUI.Axes;
 using MEGraph.MAUI.Legends;
 using MEGraph.MAUI.Series;
+using MEGraph.MAUI.Styles;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -14,7 +15,6 @@ namespace MEGraph.MAUI.Cores
     {
         private ChartDrawable _drawable;
         public List<ISeries> Series { get; } = new();
-        public Thickness ChartPadding { get; set; } = new Thickness(50, 40, 20, 30);
         public ObservableCollection<IAxis> Axes
         {
             get => (ObservableCollection<IAxis>)GetValue(AxesProperty);
@@ -41,8 +41,31 @@ namespace MEGraph.MAUI.Cores
             Title = "Chart Title";
             Axes = new ObservableCollection<IAxis>
             {
-                new ValueAxis { Title = "Revenue", Orientation = AxisOrientation.Y },
-                new CategoryAxis { Title = "Months", Orientation = AxisOrientation.X, Labels = new List<string> { "Jan", "Feb", "Mar", "Apr" } }
+                new ValueAxis
+                {
+                    Title = new AxisTitle("Revenue")
+                    {
+                        FontSize = 16,
+                        FontColor = Colors.DarkBlue
+                    },
+                    Orientation = AxisOrientation.Y
+                },
+                new CategoryAxis
+                {
+                    Title = new AxisTitle("Months")
+                    {
+                        FontSize = 14,
+                        FontColor = Colors.DarkRed
+                    },
+                    Orientation = AxisOrientation.X,
+                    Labels = new List<AxisLabel>
+                    {
+                        new AxisLabel("Jan") { FontSize = 12, FontColor = Colors.Black },
+                        new AxisLabel("Feb") { FontSize = 12, FontColor = Colors.Black },
+                        new AxisLabel("Mar") { FontSize = 12, FontColor = Colors.Black },
+                        new AxisLabel("Apr") { FontSize = 12, FontColor = Colors.Black }
+                    }
+                }
             };
         }
 

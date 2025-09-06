@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MEGraph.MAUI.Axes;
 using MEGraph.MAUI.Series;
+using MEGraph.MAUI.Styles;
 using Microsoft.Maui.Graphics;
 
 namespace MEGraph.MAUI.Cores
@@ -64,14 +65,112 @@ namespace MEGraph.MAUI.Cores
                 axis.Draw(canvas, dirtyRect, plotArea);
             }
 
+            var allLineSeries = _baseChart.Series.OfType<LineSeries>().ToList();
+            float? globalMinY = null;
+            float? globalMaxY = null;
+
+            if (allLineSeries.Any())
+            {
+                var allValues = allLineSeries.SelectMany(s => s.Data).ToList();
+                if (allValues.Any())
+                {
+                    globalMinY = allValues.Min();
+                    globalMaxY = allValues.Max();
+                }
+            }
+
             foreach (var series in _baseChart.Series)
             {
-                series.Draw(canvas, plotArea);
+                if (series is LineSeries lineSeries)
+                {
+                    lineSeries.Draw(canvas, plotArea, globalMinY, globalMaxY);
+                }
+                else
+                {
+                    series.Draw(canvas, plotArea);
+                }
             }
 
             _baseChart.Legend?.Draw(canvas, dirtyRect, _baseChart.Series);
 
         }
+        //private (float left, float top, float right, float bottom) CalculateAutoMargin(ICanvas canvas, BaseChart chart, RectF outerArea)
+        //{
+        //    float top = 0, left = 0, right = 20, bottom = 0;
+
+        //    // Title
+        //    if (!string.IsNullOrWhiteSpace(chart.Title))
+        //    {
+        //        var titleSize = canvas.GetStringSize(
+        //            chart.Title,
+        //            Microsoft.Maui.Graphics.Font.Default,  // dùng default font
+        //            18
+        //        );
+        //        top = titleSize.Height + 10; // +10 padding
+        //    }
+
+        //    // Axes
+        //    foreach (var axis in chart.Axes)
+        //    {
+        //        if (axis is ValueAxis valueAxis && axis.Orientation == AxisOrientation.Y)
+        //        {
+        //            var allSeries = chart.Series.OfType<LineSeries>().ToList();
+        //            if (allSeries.Any())
+        //            {
+        //                float minY = allSeries.Min(s => s.Data.Min());
+        //                float maxY = allSeries.Max(s => s.Data.Max());
+
+        //                int tickCount = 5;
+        //                var labels = Enumerable.Range(0, tickCount + 1)
+        //                                       .Select(i => (minY + i * (maxY - minY) / tickCount).ToString("0"))
+        //                                       .ToList();
+
+        //                float maxWidth = labels.Max(l => canvas.GetStringSize(
+        //                    l,
+        //                    Microsoft.Maui.Graphics.Font.Default, 
+        //                    axis.Title.FontSize
+        //                    ).Width);
+
+        //                var titleSize = string.IsNullOrWhiteSpace(axis.Title.Text)
+        //                    ? new SizeF(0, 0)
+        //                    : canvas.GetStringSize(
+        //                        axis.Title.Text, 
+        //                        Microsoft.Maui.Graphics.Font.Default, 
+        //                        axis.Title.FontSize);
+
+        //                left = Math.Max(left, maxWidth + 10 + titleSize.Height);
+        //            }
+        //        }
+        //        else if (axis is CategoryAxis categoryAxis && axis.Orientation == AxisOrientation.X)
+        //        {
+        //            float maxLabelHeight = 0;
+        //            float maxLabelMargin = 0;
+
+        //            foreach (var label in categoryAxis.Labels)
+        //            {
+        //                var size = canvas.GetStringSize(
+        //                    label.Text,
+        //                    Microsoft.Maui.Graphics.Font.Default,
+        //                    label.FontSize
+        //                );
+        //                maxLabelHeight = Math.Max(maxLabelHeight, size.Height + label.Margin);
+        //                maxLabelMargin = Math.Max(maxLabelMargin, label.Margin);
+        //            }
+
+        //            var titleSize = string.IsNullOrWhiteSpace(categoryAxis.Title.Text)
+        //                ? new SizeF(0, 0)
+        //                : canvas.GetStringSize(categoryAxis.Title.Text,
+        //                                       Microsoft.Maui.Graphics.Font.Default,
+        //                                       categoryAxis.Title.FontSize);
+
+        //            float padding = 5;
+
+        //            bottom = Math.Max(bottom, maxLabelHeight + maxLabelMargin + padding + titleSize.Height + categoryAxis.Title.Margin);
+        //        }
+        //    }
+
+        //    return (left, top, right, bottom);
+        //}
         private (float left, float top, float right, float bottom) CalculateAutoMargin(ICanvas canvas, BaseChart chart, RectF outerArea)
         {
             float top = 0, left = 0, right = 20, bottom = 0;
@@ -81,10 +180,10 @@ namespace MEGraph.MAUI.Cores
             {
                 var titleSize = canvas.GetStringSize(
                     chart.Title,
-                    Microsoft.Maui.Graphics.Font.Default,  // dùng default font
+                    Microsoft.Maui.Graphics.Font.Default,
                     18
                 );
-                top = titleSize.Height + 10; // +10 padding
+                top = titleSize.Height + 10;
             }
 
             // Axes
@@ -92,11 +191,23 @@ namespace MEGraph.MAUI.Cores
             {
                 if (axis is ValueAxis valueAxis && axis.Orientation == AxisOrientation.Y)
                 {
-                    var allSeries = chart.Series.OfType<LineSeries>().ToList();
+                    // Lọc series có dữ liệu
+                    var allSeries = chart.Series
+                        .OfType<LineSeries>()
+                        .Where(s => s?.Data != null && s.Data.Count > 0)
+                        .ToList();
+
                     if (allSeries.Any())
                     {
-                        float minY = allSeries.Min(s => s.Data.Min());
-                        float maxY = allSeries.Max(s => s.Data.Max());
+                        // Gom toàn bộ giá trị để tránh Min/Max trên tập rỗng
+                        var values = allSeries.SelectMany(s => s.Data).ToList();
+                        float minY = values.Min();
+                        float maxY = values.Max();
+                        if (Math.Abs(maxY - minY) < float.Epsilon)
+                        {
+                            // tránh trùng min=max
+                            maxY = minY + 1f;
+                        }
 
                         int tickCount = 5;
                         var labels = Enumerable.Range(0, tickCount + 1)
@@ -105,37 +216,51 @@ namespace MEGraph.MAUI.Cores
 
                         float maxWidth = labels.Max(l => canvas.GetStringSize(
                             l,
-                            Microsoft.Maui.Graphics.Font.Default, 
-                            12
-                            ).Width);
+                            Microsoft.Maui.Graphics.Font.Default,
+                            axis.Title.FontSize
+                        ).Width);
 
-                        var titleSize = string.IsNullOrWhiteSpace(axis.Title)
+                        var titleSize = string.IsNullOrWhiteSpace(axis.Title.Text)
                             ? new SizeF(0, 0)
                             : canvas.GetStringSize(
-                                axis.Title, 
-                                Microsoft.Maui.Graphics.Font.Default, 
-                                14);
+                                axis.Title.Text,
+                                Microsoft.Maui.Graphics.Font.Default,
+                                axis.Title.FontSize);
 
                         left = Math.Max(left, maxWidth + 10 + titleSize.Height);
                     }
+                    // nếu không có dữ liệu, bỏ qua tăng lề trái cho trục Y
                 }
                 else if (axis is CategoryAxis categoryAxis && axis.Orientation == AxisOrientation.X)
                 {
-                    var labels = categoryAxis.Labels ?? new List<string>();
-                    float maxHeight = labels.Any()
-                        ? labels.Max(l => canvas.GetStringSize(l, Microsoft.Maui.Graphics.Font.Default, 12).Height)
-                        : 0;
+                    float maxLabelHeight = 0;
+                    float maxLabelMargin = 0;
 
-                    var titleSize = string.IsNullOrWhiteSpace(axis.Title)
+                    var labels = categoryAxis.Labels ?? new List<AxisLabel>();
+                    foreach (var label in labels)
+                    {
+                        var size = canvas.GetStringSize(
+                            label.Text,
+                            Microsoft.Maui.Graphics.Font.Default,
+                            label.FontSize
+                        );
+                        maxLabelHeight = Math.Max(maxLabelHeight, size.Height + label.Margin);
+                        maxLabelMargin = Math.Max(maxLabelMargin, label.Margin);
+                    }
+
+                    var titleSize = string.IsNullOrWhiteSpace(categoryAxis.Title.Text)
                         ? new SizeF(0, 0)
-                        : canvas.GetStringSize(axis.Title, Microsoft.Maui.Graphics.Font.Default, 14);
+                        : canvas.GetStringSize(categoryAxis.Title.Text,
+                                               Microsoft.Maui.Graphics.Font.Default,
+                                               categoryAxis.Title.FontSize);
 
-                    bottom = Math.Max(bottom, maxHeight + 5 + titleSize.Height + 5);
+                    float padding = 5;
+
+                    bottom = Math.Max(bottom, maxLabelHeight + maxLabelMargin + padding + titleSize.Height + categoryAxis.Title.Margin);
                 }
             }
 
             return (left, top, right, bottom);
         }
-
     }
 }

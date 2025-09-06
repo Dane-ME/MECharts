@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MEGraph.MAUI.Styles;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,9 +9,9 @@ namespace MEGraph.MAUI.Axes
 {
     public class CategoryAxis : IAxis
     {
-        public string Title { get; set; } = "Category";
+        public AxisTitle Title { get; set; } = new AxisTitle("Category");
         public AxisOrientation Orientation { get; set; } = AxisOrientation.X;
-        public List<string> Labels { get; set; } = new();
+        public List<AxisLabel> Labels { get; set; } = new();
         public Color StrokeColor { get; set; } = Colors.Black;
 
         public void Draw(ICanvas canvas, RectF outerArea, RectF plotArea)
@@ -22,36 +23,49 @@ namespace MEGraph.MAUI.Axes
 
             canvas.DrawLine(plotArea.Left, plotArea.Bottom, plotArea.Right, plotArea.Bottom);
 
-            float marginBottom = outerArea.Bottom - plotArea.Bottom;
-            float labelHeight = marginBottom * 0.6f; 
-            float titleHeight = marginBottom * 0.4f; 
+            float maxLabelHeight = 0;
+            foreach (var lbl in Labels)
+            {
+                var size = canvas.GetStringSize(lbl.Text, Microsoft.Maui.Graphics.Font.Default, lbl.FontSize);
+                maxLabelHeight = Math.Max(maxLabelHeight, size.Height + lbl.Margin);
+            }
 
-            var labelArea = new RectF(plotArea.Left, plotArea.Bottom, plotArea.Width, labelHeight);
+            float titleHeight = 0;
+            if (!string.IsNullOrWhiteSpace(Title?.Text))
+            {
+                var titleSize = canvas.GetStringSize(Title.Text, Microsoft.Maui.Graphics.Font.Default, Title.FontSize);
+                titleHeight = titleSize.Height + Title.Margin;
+            }
+
+            var labelArea = new RectF(plotArea.Left, plotArea.Bottom + Labels.First().Margin, plotArea.Width, maxLabelHeight);
             var titleArea = new RectF(plotArea.Left, labelArea.Bottom, plotArea.Width, titleHeight);
 
             if (Labels?.Any() == true)
             {
-                float stepX = plotArea.Width / (Labels.Count - 1); // đồng bộ với Data
+                float stepX = plotArea.Width / (Labels.Count - 1);
                 for (int i = 0; i < Labels.Count; i++)
                 {
                     float x = plotArea.Left + i * stepX;
-                    canvas.FontSize = 12;
-                    canvas.FontColor = Colors.Black;
-                    canvas.DrawString(Labels[i], x, labelArea.Center.Y, HorizontalAlignment.Center);
+                    var lbl = Labels[i];
+
+                    canvas.FontSize = lbl.FontSize;
+                    canvas.FontColor = lbl.FontColor;
+                    canvas.DrawString(lbl.Text, x, labelArea.Center.Y, HorizontalAlignment.Center);
                 }
             }
 
-            if (!string.IsNullOrWhiteSpace(Title))
+            if (!string.IsNullOrWhiteSpace(Title?.Text))
             {
-                canvas.FontSize = 14;
-                canvas.FontColor = Colors.Black;
+                canvas.FontSize = Title.FontSize;
+                canvas.FontColor = Title.FontColor;
                 canvas.DrawString(
-                    Title,
+                    Title.Text,
                     titleArea,
                     HorizontalAlignment.Center,
-                    VerticalAlignment.Center
+                    VerticalAlignment.Top
                 );
             }
         }
+
     }
 }
