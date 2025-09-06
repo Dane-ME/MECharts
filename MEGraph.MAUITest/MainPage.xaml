@@ -15,7 +15,10 @@
     
     <charts:LineChart 
         x:Name="lineChart"
-        SeriesItems="{Binding MySeries}"
-        Axes="{Binding ChartAxes}"
+        Title="{Binding ChartTitle}"
+        SeriesItems="{Binding SeriesCollection}"
+        ChartAxes="{Binding AxesCollection}"
+        BackgroundColor="White"
+        Margin="16"
         />
 </ContentPage>

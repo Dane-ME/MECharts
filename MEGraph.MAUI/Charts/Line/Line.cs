@@ -1,53 +1,42 @@
-﻿using MEGraph.MAUI.Cores;
+﻿using MEGraph.MAUI.Axes;
+using MEGraph.MAUI.Axes.Line;
+using MEGraph.MAUI.Cores;
 using MEGraph.MAUI.Series;
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using MEGraph.MAUI.Axes;
 
+using BaseL = MEGraph.MAUI.Charts.Line.Base;
+using LineL = MEGraph.MAUI.Charts.Line.Line;
 
-namespace MEGraph.MAUI.Charts
+namespace MEGraph.MAUI.Charts.Line
 {
-    public class LineChart : BaseChart
+    public abstract class Line : BaseL
     {
-        public LineSeries Series { get; private set; }
-        public List<LineSeries> SeriesList { get; private set; }
 
-        public LineChart()
+        // === AXES PROPERTIES ===
+        public Category XAxis { get; private set; }
+        public Value YAxis { get; private set; }
+
+        public Line()
         {
-            SeriesList = new List<LineSeries>();
+            XAxis = new Category();
+            YAxis = new Value();
 
-            var defaultSeries = new LineSeries();
-            Series = defaultSeries;
-
-            SeriesList.Add(defaultSeries);
-            ((BaseChart)this).Series.Add(defaultSeries);
+            Axes.Add(XAxis);
+            Axes.Add(YAxis);
         }
-
-        public void AddSeries(LineSeries series)
-        {
-            SeriesList.Add(series);
-            ((BaseChart)this).Series.Add(series);
-            Refresh();
-        }
-
-        public void SetData(IEnumerable<float> data)
-        {
-            Series.Data = data.ToList();
-            Refresh();
-        }
-
         #region Support Bindable Data
 
         public static readonly BindableProperty DataProperty =
         BindableProperty.Create(
             nameof(Data),
             typeof(IEnumerable<float>),
-            typeof(LineChart),
+            typeof(LineL),
             default(IEnumerable<float>),
             propertyChanged: OnDataChanged
             );
@@ -60,13 +49,12 @@ namespace MEGraph.MAUI.Charts
 
         private static void OnDataChanged(BindableObject bindable, object oldValue, object newValue)
         {
-            var chart = (LineChart)bindable;
+            var chart = (LineL)bindable;
             chart.AttachDataChangedHandler(oldValue as INotifyCollectionChanged, newValue as INotifyCollectionChanged);
 
             if (newValue is IEnumerable<float> values)
             {
-                chart.Series.Data = values.ToList();
-                chart.Refresh();
+                chart.UpdateDataAndAxes(values);
             }
         }
 
@@ -83,9 +71,40 @@ namespace MEGraph.MAUI.Charts
         {
             if (Data != null)
             {
-                Series.Data = Data.ToList();
-                Refresh();
+                UpdateDataAndAxes(Data);
             }
+        }
+
+        private void UpdateDataAndAxes(IEnumerable<float> data)
+        {
+            var dataList = data.ToList();
+
+            // Cập nhật series data
+            if (Series.Any())
+            {
+                var lineSeries = Series.OfType<LineSeries>().FirstOrDefault();
+                if (lineSeries != null)
+                {
+                    lineSeries.Data = dataList;
+                }
+            }
+
+            // Cập nhật X-axis categories
+            var categories = dataList.Select((_, index) => $"Point {index + 1}").ToArray();
+            XAxis.SetCategories(categories);
+
+            // Cập nhật Y-axis range
+            if (dataList.Any())
+            {
+                float minValue = dataList.Min();
+                float maxValue = dataList.Max();
+
+                // Thêm padding 10% cho Y-axis
+                float padding = (maxValue - minValue) * 0.1f;
+                YAxis.SetValueRange(minValue - padding, maxValue + padding);
+            }
+
+            Refresh();
         }
         #endregion
 
@@ -95,7 +114,7 @@ namespace MEGraph.MAUI.Charts
             BindableProperty.Create(
             nameof(SeriesItems),
             typeof(ObservableCollection<LineSeries>),
-            typeof(LineChart),
+            typeof(Line),
             default(ObservableCollection<LineSeries>),
             propertyChanged: OnSeriesChanged
             );
@@ -108,7 +127,7 @@ namespace MEGraph.MAUI.Charts
 
         private static void OnSeriesChanged(BindableObject bindable, object oldValue, object newValue)
         {
-            var chart = (LineChart)bindable;
+            var chart = (Line)bindable;
 
             if (oldValue is INotifyCollectionChanged oldCollection)
             {
@@ -122,11 +141,8 @@ namespace MEGraph.MAUI.Charts
             }
             else
             {
-                // Reset về default series khi newValue là null
-                chart.SeriesList.Clear();
-                chart.SeriesList.Add(chart.Series);
-                ((BaseChart)chart).Series.Clear();
-                ((BaseChart)chart).Series.Add(chart.Series);
+                chart.Series.Clear();
+                chart.Series.Add(chart.CreateDefaultSeries());
             }
 
             chart.Refresh();
@@ -134,7 +150,7 @@ namespace MEGraph.MAUI.Charts
 
         private void OnSeriesCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            if(sender is ObservableCollection<LineSeries> items)
+            if (sender is ObservableCollection<LineSeries> items)
             {
                 SyncSeriesFromItems(items);
                 Refresh();
@@ -143,20 +159,13 @@ namespace MEGraph.MAUI.Charts
 
         private void SyncSeriesFromItems(ObservableCollection<LineSeries> items)
         {
-            SeriesList.Clear();
-            ((BaseChart)this).Series.Clear();
-
+            Series.Clear();
             foreach (var s in items)
             {
-                SeriesList.Add(s);
-                ((BaseChart)this).Series.Add(s);
-            }
-
-            if (SeriesList.Count > 0)
-            {
-                Series = SeriesList[0];
+                Series.Add(s);
             }
         }
+
         #endregion
 
         #region Support Bindable Axes
@@ -165,7 +174,7 @@ namespace MEGraph.MAUI.Charts
             BindableProperty.Create(
                 nameof(ChartAxes),
                 typeof(ObservableCollection<IAxis>),
-                typeof(LineChart),
+                typeof(Line),
                 default(ObservableCollection<IAxis>),
                 propertyChanged: OnChartAxesChanged
             );
@@ -178,7 +187,7 @@ namespace MEGraph.MAUI.Charts
 
         private static void OnChartAxesChanged(BindableObject bindable, object oldValue, object newValue)
         {
-            var chart = (LineChart)bindable;
+            var chart = (Line)bindable;
 
             if (oldValue is ObservableCollection<IAxis> oldAxes)
             {
@@ -188,7 +197,6 @@ namespace MEGraph.MAUI.Charts
             if (newValue is ObservableCollection<IAxis> newAxes)
             {
                 newAxes.CollectionChanged += chart.OnAxesCollectionChanged;
-                // Sync với BaseChart.Axes
                 chart.SyncAxesFromChartAxes(newAxes);
             }
 
@@ -214,6 +222,71 @@ namespace MEGraph.MAUI.Charts
         }
 
         #endregion
-    }
 
+        #region Public Methods
+
+        public void SetData(IEnumerable<float> data)
+        {
+            Data = data;
+        }
+
+        public void SetData(IEnumerable<float> data, IEnumerable<string> categories)
+        {
+            Data = data;
+            if (categories != null)
+            {
+                XAxis.SetCategories(categories.ToArray());
+            }
+        }
+
+        public void SetData(IEnumerable<float> data, IEnumerable<string> categories, float minValue, float maxValue)
+        {
+            Data = data;
+            if (categories != null)
+            {
+                XAxis.SetCategories(categories.ToArray());
+            }
+            YAxis.SetValueRange(minValue, maxValue);
+        }
+
+        public void AddSeries(LineSeries series)
+        {
+            Series.Add(series);
+            Refresh();
+        }
+
+        public void RemoveSeries(LineSeries series)
+        {
+            Series.Remove(series);
+            Refresh();
+        }
+
+        public void SetXAxisCategories(params string[] categories)
+        {
+            XAxis.SetCategories(categories);
+        }
+
+        public void SetYAxisRange(float min, float max)
+        {
+            YAxis.SetValueRange(min, max);
+        }
+
+        public void SetYAxisRange(float min, float max, int tickCount)
+        {
+            YAxis.SetValueRange(min, max, tickCount);
+        }
+
+        public void SetYAxisRange(float min, float max, float tickInterval)
+        {
+            YAxis.SetValueRange(min, max, tickInterval);
+        }
+
+        #endregion
+
+        #region Abstract Methods
+
+        protected abstract LineSeries CreateDefaultSeries();
+
+        #endregion
+    }
 }

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MEGraph.MAUI.Cores
+namespace MEGraph.MAUI.Charts.Line
 {
-    class ChartOptions
+    public class Stacked
     {
     }
 }

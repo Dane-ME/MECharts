@@ -1,4 +1,5 @@
 ﻿using MEGraph.MAUI.Axes;
+using MEGraph.MAUI.Cores.Pipeline;
 using MEGraph.MAUI.Legends;
 using MEGraph.MAUI.Series;
 using MEGraph.MAUI.Styles;
@@ -13,7 +14,7 @@ namespace MEGraph.MAUI.Cores
 {
     public abstract class BaseChart : GraphicsView, IDisposable
     {
-        private ChartDrawable _drawable;
+        private IRenderPipeline _renderPipeline;
         public List<ISeries> Series { get; } = new();
         public ObservableCollection<IAxis> Axes
         {
@@ -34,42 +35,20 @@ namespace MEGraph.MAUI.Cores
 
         public BaseChart()
         {
-            _drawable = new ChartDrawable(this);
-            Drawable = _drawable;
+            _renderPipeline = new LineRenderPipeline(this);
+            Drawable = _renderPipeline;
             Unloaded += (s, e) => Dispose();
-
             Title = "Chart Title";
-            Axes = new ObservableCollection<IAxis>
-            {
-                new ValueAxis
-                {
-                    Title = new AxisTitle("Revenue")
-                    {
-                        FontSize = 16,
-                        FontColor = Colors.DarkBlue
-                    },
-                    Orientation = AxisOrientation.Y
-                },
-                new CategoryAxis
-                {
-                    Title = new AxisTitle("Months")
-                    {
-                        FontSize = 14,
-                        FontColor = Colors.DarkRed
-                    },
-                    Orientation = AxisOrientation.X,
-                    Labels = new List<AxisLabel>
-                    {
-                        new AxisLabel("Jan") { FontSize = 12, FontColor = Colors.Black },
-                        new AxisLabel("Feb") { FontSize = 12, FontColor = Colors.Black },
-                        new AxisLabel("Mar") { FontSize = 12, FontColor = Colors.Black },
-                        new AxisLabel("Apr") { FontSize = 12, FontColor = Colors.Black }
-                    }
-                }
-            };
         }
 
         public void Refresh() => this.Invalidate();
+
+        public void SetRenderPipeline(IRenderPipeline pipeline)
+        {
+            _renderPipeline = pipeline ?? throw new ArgumentNullException(nameof(pipeline));
+            Drawable = _renderPipeline;
+            Refresh();
+        }
 
         public static readonly BindableProperty TitleProperty =
         BindableProperty.Create(
@@ -116,9 +95,12 @@ namespace MEGraph.MAUI.Cores
 
         public void Dispose()
         {
-            if (_drawable != null)
+            if (_renderPipeline != null)
             {
-                _drawable.Dispose();
+                if (_renderPipeline is IDisposable disposablePipeline)
+                {
+                    disposablePipeline.Dispose();   
+                }
                 Drawable = null;
             }
         }

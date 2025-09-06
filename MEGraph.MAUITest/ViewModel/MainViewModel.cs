@@ -1,9 +1,13 @@
 ﻿using MEGraph.MAUI.Axes;
+using MEGraph.MAUI.Axes.Line;
+using MEGraph.MAUI.Series;
 using MEGraph.MAUI.Styles;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,97 +15,115 @@ namespace MEGraph.MAUITest.ViewModel
 {
     public class MainViewModel
     {
-        public ObservableCollection<float> ChartData { get; set; }
-        public string Title { get; set; } = "Line Chart Example";
-        public ObservableCollection<IAxis> ChartAxes { get; set; }
+        private string _chartTitle = "Sales Chart";
+        private ObservableCollection<float> _chartData;
+        private ObservableCollection<LineSeries> _seriesCollection;
+        private ObservableCollection<IAxis> _axesCollection;
 
-        public ObservableCollection<MEGraph.MAUI.Series.LineSeries> MySeries { get; set; }
-        
+        public string ChartTitle
+        {
+            get => _chartTitle;
+            set => SetProperty(ref _chartTitle, value);
+        }
 
+        public ObservableCollection<float> ChartData
+        {
+            get => _chartData;
+            set => SetProperty(ref _chartData, value);
+        }
+
+        public ObservableCollection<LineSeries> SeriesCollection
+        {
+            get => _seriesCollection;
+            set => SetProperty(ref _seriesCollection, value);
+        }
+
+        public ObservableCollection<IAxis> AxesCollection
+        {
+            get => _axesCollection;
+            set => SetProperty(ref _axesCollection, value);
+        }
         public MainViewModel()
         {
-            ChartData = new ObservableCollection<float> { 10, 30, 15, 50, 40, 60, 100, 0, 50 };
-            ChartAxes = new ObservableCollection<IAxis>
+            // Dữ liệu mẫu
+            ChartData = new ObservableCollection<float>
             {
-                new ValueAxis
+                100, 120, 90, 150, 200, 180, 220, 190, 250, 300, 280, 320
+            };
+
+            var ChartData1 = new ObservableCollection<float>
+            {
+                140, 120, 150, 150, 200, 190, 250, 190, 260, 310, 300, 330
+            };
+
+            // Tạo series
+            SeriesCollection = new ObservableCollection<LineSeries>
+            {
+                new LineSeries
                 {
-                    Title = new AxisTitle("Revenue")
-                    {
-                        FontSize = 16,
-                        FontColor = Colors.DarkBlue
-                    },
-                    Orientation = AxisOrientation.Y
+                    Name = "Sales",
+                    Data = ChartData.ToList(),
+                    StrokeColor = Colors.Blue,
+                    StrokeWidth = 3f
                 },
-                new CategoryAxis
+                new LineSeries
                 {
-                    Title = new AxisTitle("Months")
-                    {
-                        FontSize = 16,
-                        FontColor = Colors.DarkRed
-                    },
-                    Orientation = AxisOrientation.X,
-                    Labels = new List<AxisLabel>
-                    {
-                        new AxisLabel("A") { FontSize = 12, FontColor = Colors.Black },
-                        new AxisLabel("B") { FontSize = 12, FontColor = Colors.Black },
-                        new AxisLabel("C") { FontSize = 12, FontColor = Colors.Black },
-                        new AxisLabel("D") { FontSize = 12, FontColor = Colors.Black },
-                        new AxisLabel("E") { FontSize = 12, FontColor = Colors.Black },
-                        new AxisLabel("F") { FontSize = 12, FontColor = Colors.Black },
-                        new AxisLabel("G") { FontSize = 12, FontColor = Colors.Black },
-                        new AxisLabel("H") { FontSize = 12, FontColor = Colors.Black },
-                        new AxisLabel("I") { FontSize = 12, FontColor = Colors.Black }
-                    }
+                    Name = "Sales1",
+                    Data = ChartData1.ToList(),
+                    StrokeColor = Colors.Red,
+                    StrokeWidth = 3f
                 }
             };
 
-            MySeries = new ObservableCollection<MEGraph.MAUI.Series.LineSeries>
-{
-    new MEGraph.MAUI.Series.LineSeries
-    {
-        Name = "Product A",
-        Data = new List<float> { 10, 20, 15, 30, 25 },
-        StrokeColor = Colors.Red,
-        StrokeWidth = 3f,
-    },
-    new MEGraph.MAUI.Series.LineSeries
-    {
-        Name = "Product B",
-        Data = new List<float> { 12, 18, 22, 28, 26 },
-        StrokeColor = Colors.Blue,
-        StrokeWidth = 3f
-    }
-};
+            // Tạo axes
+            AxesCollection = new ObservableCollection<IAxis>
+            {
+                new Category
+                {
+                    Orientation = AxisOrientation.X,
+                    Labels = new List<AxisLabel>
+                    {
+                        new AxisLabel { Content = "Jan" },
+                        new AxisLabel { Content = "Feb" },
+                        new AxisLabel { Content = "Mar" },
+                        new AxisLabel { Content = "Apr" },
+                        new AxisLabel { Content = "May" },
+                        new AxisLabel { Content = "Jun" },
+                        new AxisLabel { Content = "Jul" },
+                        new AxisLabel { Content = "Aug" },
+                        new AxisLabel { Content = "Sep" },
+                        new AxisLabel { Content = "Oct" },
+                        new AxisLabel { Content = "Nov" },
+                        new AxisLabel { Content = "Dec" }
+                    }
+                },
+                new Value
+                {
+                    Orientation = AxisOrientation.Y,
+                    Title = new AxisTitle { Content = "Sales ($)" }
+                }
+            };
+        }
 
-            ChartAxes = new ObservableCollection<IAxis>
-{
-    new ValueAxis
-    {
-        Title = new AxisTitle("Revenue")
+        #region INotifyPropertyChanged
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            FontSize = 16,
-            FontColor = Colors.DarkBlue
-        },
-        Orientation = AxisOrientation.Y
-    },
-    new CategoryAxis
-    {
-        Title = new AxisTitle("Months")
-        {
-            FontSize = 16,
-            FontColor = Colors.DarkRed
-        },
-        Orientation = AxisOrientation.X,
-        Labels = new List<AxisLabel>
-        {
-            new AxisLabel("A") { FontSize = 12, FontColor = Colors.Black },
-            new AxisLabel("B") { FontSize = 12, FontColor = Colors.Black },
-            new AxisLabel("C") { FontSize = 12, FontColor = Colors.Black },
-            new AxisLabel("D") { FontSize = 12, FontColor = Colors.Black },
-            new AxisLabel("E") { FontSize = 12, FontColor = Colors.Black }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-    }
-};
+
+        protected bool SetProperty<T>(ref T backingStore, T value, [CallerMemberName] string propertyName = "")
+        {
+            if (EqualityComparer<T>.Default.Equals(backingStore, value))
+                return false;
+
+            backingStore = value;
+            OnPropertyChanged(propertyName);
+            return true;
         }
+
+        #endregion
     }
 }
