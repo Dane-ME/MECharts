@@ -1,7 +1,6 @@
 ﻿using MEGraph.MAUI.Axes;
-using MEGraph.MAUI.Axes.Line;
 using MEGraph.MAUI.Cores;
-using MEGraph.MAUI.Series;
+using MEGraph.MAUI.Series.Line;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -9,34 +8,48 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
-using BaseL = MEGraph.MAUI.Charts.Line.Base;
-using LineL = MEGraph.MAUI.Charts.Line.Line;
+using Microsoft.Maui.Controls;
 
 namespace MEGraph.MAUI.Charts.Line
 {
-    public abstract class Line : BaseL
+    public class StackedLineChart : BaseChart
     {
+        public StackedLineSeries Series { get; private set; }
+        public List<StackedLineSeries> SeriesList { get; private set; }
 
-        // === AXES PROPERTIES ===
-        public Category XAxis { get; private set; }
-        public Value YAxis { get; private set; }
-
-        public Line()
+        public StackedLineChart()
         {
-            XAxis = new Category();
-            YAxis = new Value();
+            SeriesList = new List<StackedLineSeries>();
 
-            Axes.Add(XAxis);
-            Axes.Add(YAxis);
+            var defaultSeries = new StackedLineSeries();
+            Series = defaultSeries;
+
+            SeriesList.Add(defaultSeries);
+            ((BaseChart)this).Series.Add(defaultSeries);
+
+            SetRenderPipeline(new Cores.Pipeline.StackedLineRenderPipeline(this));
         }
+
+        public void AddSeries(StackedLineSeries series)
+        {
+            SeriesList.Add(series);
+            ((BaseChart)this).Series.Add(series);
+            Refresh();
+        }
+
+        public void SetData(IEnumerable<float> data)
+        {
+            Series.Data = data.ToList();
+            Refresh();
+        }
+
         #region Support Bindable Data
 
         public static readonly BindableProperty DataProperty =
         BindableProperty.Create(
             nameof(Data),
             typeof(IEnumerable<float>),
-            typeof(LineL),
+            typeof(StackedLineChart),
             default(IEnumerable<float>),
             propertyChanged: OnDataChanged
             );
@@ -49,12 +62,13 @@ namespace MEGraph.MAUI.Charts.Line
 
         private static void OnDataChanged(BindableObject bindable, object oldValue, object newValue)
         {
-            var chart = (LineL)bindable;
+            var chart = (StackedLineChart)bindable;
             chart.AttachDataChangedHandler(oldValue as INotifyCollectionChanged, newValue as INotifyCollectionChanged);
 
             if (newValue is IEnumerable<float> values)
             {
-                chart.UpdateDataAndAxes(values);
+                chart.Series.Data = values.ToList();
+                chart.Refresh();
             }
         }
 
@@ -71,40 +85,9 @@ namespace MEGraph.MAUI.Charts.Line
         {
             if (Data != null)
             {
-                UpdateDataAndAxes(Data);
+                Series.Data = Data.ToList();
+                Refresh();
             }
-        }
-
-        private void UpdateDataAndAxes(IEnumerable<float> data)
-        {
-            var dataList = data.ToList();
-
-            // Cập nhật series data
-            if (Series.Any())
-            {
-                var lineSeries = Series.OfType<LineSeries>().FirstOrDefault();
-                if (lineSeries != null)
-                {
-                    lineSeries.Data = dataList;
-                }
-            }
-
-            // Cập nhật X-axis categories
-            var categories = dataList.Select((_, index) => $"Point {index + 1}").ToArray();
-            XAxis.SetCategories(categories);
-
-            // Cập nhật Y-axis range
-            if (dataList.Any())
-            {
-                float minValue = dataList.Min();
-                float maxValue = dataList.Max();
-
-                // Thêm padding 10% cho Y-axis
-                float padding = (maxValue - minValue) * 0.1f;
-                YAxis.SetValueRange(minValue - padding, maxValue + padding);
-            }
-
-            Refresh();
         }
         #endregion
 
@@ -113,21 +96,21 @@ namespace MEGraph.MAUI.Charts.Line
         public static readonly BindableProperty SeriesItemsProperty =
             BindableProperty.Create(
             nameof(SeriesItems),
-            typeof(ObservableCollection<LineSeries>),
-            typeof(Line),
-            default(ObservableCollection<LineSeries>),
+            typeof(ObservableCollection<StackedLineSeries>),
+            typeof(StackedLineChart),
+            default(ObservableCollection<StackedLineSeries>),
             propertyChanged: OnSeriesChanged
             );
 
-        public ObservableCollection<LineSeries> SeriesItems
+        public ObservableCollection<StackedLineSeries> SeriesItems
         {
-            get => (ObservableCollection<LineSeries>)GetValue(SeriesItemsProperty);
+            get => (ObservableCollection<StackedLineSeries>)GetValue(SeriesItemsProperty);
             set => SetValue(SeriesItemsProperty, value);
         }
 
         private static void OnSeriesChanged(BindableObject bindable, object oldValue, object newValue)
         {
-            var chart = (Line)bindable;
+            var chart = (StackedLineChart)bindable;
 
             if (oldValue is INotifyCollectionChanged oldCollection)
             {
@@ -137,12 +120,15 @@ namespace MEGraph.MAUI.Charts.Line
             if (newValue is INotifyCollectionChanged newCollection)
             {
                 newCollection.CollectionChanged += chart.OnSeriesCollectionChanged;
-                chart.SyncSeriesFromItems((ObservableCollection<LineSeries>)newCollection);
+                chart.SyncSeriesFromItems((ObservableCollection<StackedLineSeries>)newCollection);
             }
             else
             {
-                chart.Series.Clear();
-                chart.Series.Add(chart.CreateDefaultSeries());
+                // Reset về default series khi newValue là null
+                chart.SeriesList.Clear();
+                chart.SeriesList.Add(chart.Series);
+                ((BaseChart)chart).Series.Clear();
+                ((BaseChart)chart).Series.Add(chart.Series);
             }
 
             chart.Refresh();
@@ -150,22 +136,29 @@ namespace MEGraph.MAUI.Charts.Line
 
         private void OnSeriesCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            if (sender is ObservableCollection<LineSeries> items)
+            if (sender is ObservableCollection<StackedLineSeries> items)
             {
                 SyncSeriesFromItems(items);
                 Refresh();
             }
         }
 
-        private void SyncSeriesFromItems(ObservableCollection<LineSeries> items)
+        private void SyncSeriesFromItems(ObservableCollection<StackedLineSeries> items)
         {
-            Series.Clear();
+            SeriesList.Clear();
+            ((BaseChart)this).Series.Clear();
+
             foreach (var s in items)
             {
-                Series.Add(s);
+                SeriesList.Add(s);
+                ((BaseChart)this).Series.Add(s);
+            }
+
+            if (SeriesList.Count > 0)
+            {
+                Series = SeriesList[0];
             }
         }
-
         #endregion
 
         #region Support Bindable Axes
@@ -174,7 +167,7 @@ namespace MEGraph.MAUI.Charts.Line
             BindableProperty.Create(
                 nameof(ChartAxes),
                 typeof(ObservableCollection<IAxis>),
-                typeof(Line),
+                typeof(StackedLineChart),
                 default(ObservableCollection<IAxis>),
                 propertyChanged: OnChartAxesChanged
             );
@@ -187,7 +180,7 @@ namespace MEGraph.MAUI.Charts.Line
 
         private static void OnChartAxesChanged(BindableObject bindable, object oldValue, object newValue)
         {
-            var chart = (Line)bindable;
+            var chart = (StackedLineChart)bindable;
 
             if (oldValue is ObservableCollection<IAxis> oldAxes)
             {
@@ -197,6 +190,7 @@ namespace MEGraph.MAUI.Charts.Line
             if (newValue is ObservableCollection<IAxis> newAxes)
             {
                 newAxes.CollectionChanged += chart.OnAxesCollectionChanged;
+                // Sync với BaseChart.Axes
                 chart.SyncAxesFromChartAxes(newAxes);
             }
 
@@ -220,72 +214,6 @@ namespace MEGraph.MAUI.Charts.Line
                 Axes.Add(axis);
             }
         }
-
-        #endregion
-
-        #region Public Methods
-
-        public void SetData(IEnumerable<float> data)
-        {
-            Data = data;
-        }
-
-        public void SetData(IEnumerable<float> data, IEnumerable<string> categories)
-        {
-            Data = data;
-            if (categories != null)
-            {
-                XAxis.SetCategories(categories.ToArray());
-            }
-        }
-
-        public void SetData(IEnumerable<float> data, IEnumerable<string> categories, float minValue, float maxValue)
-        {
-            Data = data;
-            if (categories != null)
-            {
-                XAxis.SetCategories(categories.ToArray());
-            }
-            YAxis.SetValueRange(minValue, maxValue);
-        }
-
-        public void AddSeries(LineSeries series)
-        {
-            Series.Add(series);
-            Refresh();
-        }
-
-        public void RemoveSeries(LineSeries series)
-        {
-            Series.Remove(series);
-            Refresh();
-        }
-
-        public void SetXAxisCategories(params string[] categories)
-        {
-            XAxis.SetCategories(categories);
-        }
-
-        public void SetYAxisRange(float min, float max)
-        {
-            YAxis.SetValueRange(min, max);
-        }
-
-        public void SetYAxisRange(float min, float max, int tickCount)
-        {
-            YAxis.SetValueRange(min, max, tickCount);
-        }
-
-        public void SetYAxisRange(float min, float max, float tickInterval)
-        {
-            YAxis.SetValueRange(min, max, tickInterval);
-        }
-
-        #endregion
-
-        #region Abstract Methods
-
-        protected abstract LineSeries CreateDefaultSeries();
 
         #endregion
     }

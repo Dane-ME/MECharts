@@ -1,6 +1,7 @@
 ﻿using MEGraph.MAUI.Axes;
 using MEGraph.MAUI.Axes.Line;
 using MEGraph.MAUI.Series;
+using MEGraph.MAUI.Series.Line;
 using MEGraph.MAUI.Styles;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,7 @@ namespace MEGraph.MAUITest.ViewModel
     {
         private string _chartTitle = "Sales Chart";
         private ObservableCollection<float> _chartData;
-        private ObservableCollection<LineSeries> _seriesCollection;
+        private ObservableCollection<StackedLineSeries> _seriesCollection;
         private ObservableCollection<IAxis> _axesCollection;
 
         public string ChartTitle
@@ -32,7 +33,7 @@ namespace MEGraph.MAUITest.ViewModel
             set => SetProperty(ref _chartData, value);
         }
 
-        public ObservableCollection<LineSeries> SeriesCollection
+        public ObservableCollection<StackedLineSeries> SeriesCollection
         {
             get => _seriesCollection;
             set => SetProperty(ref _seriesCollection, value);
@@ -57,16 +58,16 @@ namespace MEGraph.MAUITest.ViewModel
             };
 
             // Tạo series
-            SeriesCollection = new ObservableCollection<LineSeries>
+            SeriesCollection = new ObservableCollection<StackedLineSeries>
             {
-                new LineSeries
+                new StackedLineSeries
                 {
                     Name = "Sales",
                     Data = ChartData.ToList(),
                     StrokeColor = Colors.Blue,
                     StrokeWidth = 3f
                 },
-                new LineSeries
+                new StackedLineSeries
                 {
                     Name = "Sales1",
                     Data = ChartData1.ToList(),

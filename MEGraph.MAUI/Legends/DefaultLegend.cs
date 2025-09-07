@@ -1,4 +1,5 @@
 ﻿using MEGraph.MAUI.Series;
+using MEGraph.MAUI.Series.Line;
 using System;
 using System.Collections.Generic;
 using System.Linq;

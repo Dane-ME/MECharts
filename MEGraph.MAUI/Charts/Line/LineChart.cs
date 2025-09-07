@@ -8,9 +8,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MEGraph.MAUI.Axes;
+using MEGraph.MAUI.Series.Line;
 
 
-namespace MEGraph.MAUI.Charts
+namespace MEGraph.MAUI.Charts.Line
 {
     public class LineChart : BaseChart
     {
@@ -134,7 +135,7 @@ namespace MEGraph.MAUI.Charts
 
         private void OnSeriesCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            if(sender is ObservableCollection<LineSeries> items)
+            if (sender is ObservableCollection<LineSeries> items)
             {
                 SyncSeriesFromItems(items);
                 Refresh();
