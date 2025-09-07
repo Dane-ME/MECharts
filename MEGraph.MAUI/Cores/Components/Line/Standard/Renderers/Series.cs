@@ -6,23 +6,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MEGraph.MAUI.Cores.Components.Line.Renderers
+namespace MEGraph.MAUI.Cores.Components.Line.Standard.Renderers
 {
-    public class Series : ISeries
+    public class Series
     {
         private BaseChart? _baseChart;
         public string Name => _baseChart?.Title ?? "Name is not exist!";
 
         public void Draw(ICanvas canvas, RectF plotArea, BaseChart? baseChart)
         {
-            if (baseChart == null) throw new ArgumentNullException(nameof(baseChart));
-            _baseChart = baseChart;
-            Draw(canvas, plotArea);
-        }
-        public void Draw(ICanvas canvas, RectF plotArea)
-        {
-            if (_baseChart == null) return;
-            var allLineSeries = _baseChart.Series.OfType<LineSeries>().ToList();
+            if (baseChart == null) return;
+
+            var allLineSeries = baseChart.Series.OfType<LineSeries>().ToList();
             float? globalMinY = null;
             float? globalMaxY = null;
 
@@ -36,7 +31,7 @@ namespace MEGraph.MAUI.Cores.Components.Line.Renderers
                 }
             }
 
-            foreach (var series in _baseChart.Series)
+            foreach (var series in baseChart.Series)
             {
                 if (series is LineSeries lineSeries)
                 {

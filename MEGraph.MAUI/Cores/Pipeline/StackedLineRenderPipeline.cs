@@ -4,17 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using MEGraph.MAUI.Cores.Components.Line.Renderers;
-using MEGraph.MAUI.Cores.Components;
-
-using RTitle = MEGraph.MAUI.Cores.Components.Line.Standard.Renderers.Title;
-using RAxes = MEGraph.MAUI.Cores.Components.Line.Standard.Renderers.Axes;
-using RSeries = MEGraph.MAUI.Cores.Components.Line.Standard.Renderers.Series;
-using RLegend = MEGraph.MAUI.Cores.Components.Line.Standard.Renderers.Legend;
+using RTitle = MEGraph.MAUI.Cores.Components.Line.Stacked.Renderers.Title;
+using RAxes = MEGraph.MAUI.Cores.Components.Line.Stacked.Renderers.Axes;
+using RLegend = MEGraph.MAUI.Cores.Components.Line.Stacked.Renderers.Legend;
+using RSeries = MEGraph.MAUI.Cores.Components.Line.Stacked.Renderers.Series;
 
 namespace MEGraph.MAUI.Cores.Pipeline
 {
-    public class LineRenderPipeline : IRenderPipeline
+    public class StackedLineRenderPipeline : IRenderPipeline
     {
         private readonly RTitle _titleRenderer;
         private readonly RAxes _axesRenderer;
@@ -22,7 +19,7 @@ namespace MEGraph.MAUI.Cores.Pipeline
         private readonly RLegend _legendRenderer;
         private BaseChart _chart;
 
-        public LineRenderPipeline()
+        public StackedLineRenderPipeline()
         {
             _titleRenderer = new RTitle();
             _axesRenderer = new RAxes();
@@ -30,14 +27,14 @@ namespace MEGraph.MAUI.Cores.Pipeline
             _legendRenderer = new RLegend();
         }
 
-        public LineRenderPipeline(BaseChart chart) : this()
+        public StackedLineRenderPipeline(BaseChart chart) : this()
         {
             _chart = chart;
         }
 
         public void Draw(ICanvas canvas, RectF dirtyRect)
         {
-            if(_chart != null)
+            if (_chart != null)
             {
                 Draw(canvas, dirtyRect, _chart);
             }
@@ -54,10 +51,10 @@ namespace MEGraph.MAUI.Cores.Pipeline
             // 3. Vẽ title
             _titleRenderer.Draw(canvas, dirtyRect, chart.Title);
 
-            // 4. Vẽ axes (Line chart specific)
+            // 4. Vẽ axes
             _axesRenderer.Draw(canvas, dirtyRect, plotArea, chart);
 
-            // 5. Vẽ series (Line chart specific)
+            // 5. Vẽ stacked series
             _seriesRenderer.Draw(canvas, plotArea, chart);
 
             // 6. Vẽ legend

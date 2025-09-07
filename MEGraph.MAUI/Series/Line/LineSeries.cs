@@ -1,9 +1,10 @@
 ﻿using MEGraph.MAUI.Charts;
+using MEGraph.MAUI.Series;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MEGraph.MAUI.Series
+namespace MEGraph.MAUI.Series.Line
 {
     public class LineSeries : ISeries
     {

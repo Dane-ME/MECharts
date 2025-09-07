@@ -8,7 +8,7 @@ namespace MEGraph.MAUI.Series
 {
     public interface ISeries
     {
-        string Name { get;}
+        string Name { get; }
         void Draw(ICanvas canvas, RectF plotArea);
     }
 }

@@ -35,17 +35,17 @@ namespace MEGraph.MAUI.Cores
 
         public BaseChart()
         {
-            _renderPipeline = new LineRenderPipeline(this);
-            Drawable = _renderPipeline;
+            SetRenderPipeline(null);
+
             Unloaded += (s, e) => Dispose();
             Title = "Chart Title";
         }
 
         public void Refresh() => this.Invalidate();
 
-        public void SetRenderPipeline(IRenderPipeline pipeline)
+        public virtual void SetRenderPipeline(IRenderPipeline? pipeline)
         {
-            _renderPipeline = pipeline ?? throw new ArgumentNullException(nameof(pipeline));
+            _renderPipeline = pipeline ?? new LineRenderPipeline(this);
             Drawable = _renderPipeline;
             Refresh();
         }
