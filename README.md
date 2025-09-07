@@ -2,7 +2,7 @@
 
 A powerful and flexible charting library for .NET MAUI applications, built with modern architecture and pipeline-based rendering.
 
-Note: Currently, only the standard, stacked line chart is functional. Other features will be added in future updates.
+Note: Currently, only the standard line chart is functional. Other features will be added in future updates.
 ## 🚀 Features
 
 - **📊 Multiple Chart Types**: Line, Bar, Column, Pie, Area, Radar, Stock charts
