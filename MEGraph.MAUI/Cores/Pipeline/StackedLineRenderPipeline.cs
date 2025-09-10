@@ -49,11 +49,17 @@ namespace MEGraph.MAUI.Cores.Pipeline
             var plotArea = CalculatePlotArea(canvas, dirtyRect, chart);
 
             // 3. Vẽ title
-            _titleRenderer.Draw(canvas, dirtyRect, chart.Title);
+            //_titleRenderer.Draw(canvas, dirtyRect, chart.Title);
 
             // 4. Vẽ axes
-            _axesRenderer.Draw(canvas, dirtyRect, plotArea, chart);
-
+            //_axesRenderer.Draw(canvas, dirtyRect, plotArea, chart);
+            if (chart.Axes != null)
+            {
+                foreach (var axis in chart.Axes)
+                {
+                    axis.Draw(canvas, dirtyRect, plotArea);
+                }
+            }
             // 5. Vẽ stacked series
             _seriesRenderer.Draw(canvas, plotArea, chart);
 
@@ -75,7 +81,7 @@ namespace MEGraph.MAUI.Cores.Pipeline
 
         private void DrawBackground(ICanvas canvas, RectF dirtyRect)
         {
-            canvas.FillColor = Colors.WhiteSmoke;
+            canvas.FillColor = _chart.BackgroundColor ?? Colors.Transparent;
             canvas.FillRectangle(dirtyRect);
         }
     }

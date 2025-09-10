@@ -1,112 +1,64 @@
 ﻿using MEGraph.MAUI.Axes;
-using MEGraph.MAUI.Axes.Line;
-using MEGraph.MAUI.Series;
-using MEGraph.MAUI.Series.Line;
+using MEGraph.MAUI.Axes.Pie;
+using MEGraph.MAUI.Series.Pie;
 using MEGraph.MAUI.Styles;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MEGraph.MAUITest.ViewModel
 {
-    public class MainViewModel
+    public class MainViewModel : INotifyPropertyChanged
     {
-        private string _chartTitle = "Sales Chart";
-        private ObservableCollection<float> _chartData;
-        private ObservableCollection<StackedLineSeries> _seriesCollection;
-        private ObservableCollection<IAxis> _axesCollection;
+        private ObservableCollection<float> _pieData;
+        private ObservableCollection<IAxis> _pieAxes;
 
-        public string ChartTitle
+        public ObservableCollection<float> PieData
         {
-            get => _chartTitle;
-            set => SetProperty(ref _chartTitle, value);
+            get => _pieData;
+            set => SetProperty(ref _pieData, value);
         }
 
-        public ObservableCollection<float> ChartData
+        public ObservableCollection<IAxis> PieAxes
         {
-            get => _chartData;
-            set => SetProperty(ref _chartData, value);
+            get => _pieAxes;
+            set => SetProperty(ref _pieAxes, value);
         }
 
-        public ObservableCollection<StackedLineSeries> SeriesCollection
-        {
-            get => _seriesCollection;
-            set => SetProperty(ref _seriesCollection, value);
-        }
-
-        public ObservableCollection<IAxis> AxesCollection
-        {
-            get => _axesCollection;
-            set => SetProperty(ref _axesCollection, value);
-        }
         public MainViewModel()
         {
-            // Dữ liệu mẫu
-            ChartData = new ObservableCollection<float>
-            {
-                100, 120, 90, 150, 200, 180, 220, 190, 250, 300, 280, 320
-            };
+            // Dữ liệu mẫu cho Pie
+            PieData = new ObservableCollection<float> { 30, 20, 10, 45, 5, 5 };
 
-            var ChartData1 = new ObservableCollection<float>
-            {
-                140, 120, 150, 150, 200, 190, 250, 190, 260, 310, 300, 330
-            };
-
-            // Tạo series
-            SeriesCollection = new ObservableCollection<StackedLineSeries>
-            {
-                new StackedLineSeries
-                {
-                    Name = "Sales",
-                    Data = ChartData.ToList(),
-                    StrokeColor = Colors.Blue,
-                    StrokeWidth = 3f
-                },
-                new StackedLineSeries
-                {
-                    Name = "Sales1",
-                    Data = ChartData1.ToList(),
-                    StrokeColor = Colors.Red,
-                    StrokeWidth = 3f
-                }
-            };
-
-            // Tạo axes
-            AxesCollection = new ObservableCollection<IAxis>
+            // Trục cho Pie (Angular Category)
+            PieAxes = new ObservableCollection<IAxis>
             {
                 new Category
                 {
-                    Orientation = AxisOrientation.X,
+                    Orientation = AxisOrientation.Angular,
+                    Title = new AxisTitle("Hehehehe")
+                    {
+                        Margin = 10,
+                        FontSize = 30,
+                        FontColor = Colors.Red,
+                        IsItalic = true,
+                        IsBold = true,
+
+                    },
                     Labels = new List<AxisLabel>
                     {
-                        new AxisLabel { Content = "Jan" },
-                        new AxisLabel { Content = "Feb" },
-                        new AxisLabel { Content = "Mar" },
-                        new AxisLabel { Content = "Apr" },
-                        new AxisLabel { Content = "May" },
-                        new AxisLabel { Content = "Jun" },
-                        new AxisLabel { Content = "Jul" },
-                        new AxisLabel { Content = "Aug" },
-                        new AxisLabel { Content = "Sep" },
-                        new AxisLabel { Content = "Oct" },
-                        new AxisLabel { Content = "Nov" },
-                        new AxisLabel { Content = "Dec" }
-                    }
-                },
-                new Value
-                {
-                    Orientation = AxisOrientation.Y,
-                    Title = new AxisTitle { Content = "Sales ($)" }
+                        new AxisLabel { Content = "A" },
+                        new AxisLabel { Content = "B" },
+                        new AxisLabel { Content = "A" },
+                        new AxisLabel { Content = "B" },
+                        new AxisLabel { Content = "A" },
+                        new AxisLabel { Content = "B" }
+                    },
+                    StrokeSize = 0,
                 }
             };
         }
-
-        #region INotifyPropertyChanged
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -124,7 +76,5 @@ namespace MEGraph.MAUITest.ViewModel
             OnPropertyChanged(propertyName);
             return true;
         }
-
-        #endregion
     }
 }

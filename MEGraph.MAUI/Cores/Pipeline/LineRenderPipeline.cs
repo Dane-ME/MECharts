@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using MEGraph.MAUI.Cores.Components.Line.Renderers;
+using MEGraph.MAUI.Cores.Components.Line.Standard.Renderers;
 using MEGraph.MAUI.Cores.Components;
 
 using RTitle = MEGraph.MAUI.Cores.Components.Line.Standard.Renderers.Title;
@@ -76,9 +76,9 @@ namespace MEGraph.MAUI.Cores.Pipeline
             );
         }
 
-        private void DrawBackground(ICanvas canvas, RectF dirtyRect)
+        public void DrawBackground(ICanvas canvas, RectF dirtyRect)
         {
-            canvas.FillColor = Colors.WhiteSmoke;
+            canvas.FillColor = _chart.BackgroundColor ?? Colors.Transparent;
             canvas.FillRectangle(dirtyRect);
         }
     }

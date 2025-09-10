@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using MEGraph.MAUI.Cores;
 using MEGraph.MAUI.Styles;
 
 
@@ -11,6 +12,7 @@ namespace MEGraph.MAUI.Axes
 {
     public abstract class Base : IAxis
     {
+        private BaseChart? _baseChart;
         // === THUỘC TÍNH CƠ BẢN ===
         public AxisTitle Title { get; set; } = new AxisTitle("");
         public List<AxisLabel> Labels { get; set; } = new();
@@ -31,10 +33,6 @@ namespace MEGraph.MAUI.Axes
         public float TickInterval { get; set; } = 10f;
         public int TickCount { get; set; } = 5;
 
-        // === THUỘC TÍNH STYLING ===
-        public Text LabelStyle { get; set; } = new Text();
-        public Text TitleStyle { get; set; } = new Text();
-
         // === THUỘC TÍNH VỊ TRÍ ===
         public float Position { get; set; } = 0f;
         public bool IsReversed { get; set; } = false;
@@ -45,11 +43,16 @@ namespace MEGraph.MAUI.Axes
         // === CONSTRUCTOR ===
         protected Base()
         {
-            LabelStyle = new Text();
-            TitleStyle = new Text();
+            
         }
 
         // === METHODS CHUNG ===
+        public virtual void Draw(ICanvas canvas, RectF outerArea, RectF plotArea, BaseChart baseChart)
+        {
+            if (baseChart == null) { return; }
+            _baseChart = baseChart;
+            Draw(canvas, outerArea, plotArea);
+        }
         public virtual void Draw(ICanvas canvas, RectF outerArea, RectF plotArea)
         {
             if (!IsVisible) return;
@@ -101,6 +104,10 @@ namespace MEGraph.MAUI.Axes
             OnAxisChanged(nameof(TickCount), TickCount, count);
         }
 
+        public (float Left, float Top, float Right, float Bottom) MeasureMargins(ICanvas canvas, RectF outerArea, ObservableCollection<IAxis> axes)
+        {
+            return CalculateMargins(canvas, outerArea, axes);
+        }
         // === ABSTRACT METHODS ===
         protected abstract void DrawAxisLine(ICanvas canvas, RectF plotArea);
         protected abstract void DrawLabels(ICanvas canvas, RectF plotArea);
@@ -125,6 +132,12 @@ namespace MEGraph.MAUI.Axes
         {
             // Implementation cơ bản - override trong derived classes
             return 0f;
+        }
+
+        protected virtual (float Left, float Top, float Right, float Bottom) CalculateMargins(ICanvas canvas, RectF outerArea, ObservableCollection<IAxis> axes)
+        {
+            // Implementation cơ bản - override trong derived classes
+            return (0, 0, 0, 0);
         }
 
         protected virtual void DrawGridLine(ICanvas canvas, float position, RectF plotArea)

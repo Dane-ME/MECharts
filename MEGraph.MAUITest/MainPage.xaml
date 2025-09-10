@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:charts="clr-namespace:MEGraph.MAUI.Charts.Line;assembly=MEGraph.MAUI"
+             xmlns:piecharts="clr-namespace:MEGraph.MAUI.Charts.Pie;assembly=MEGraph.MAUI"
+             xmlns:linecharts="clr-namespace:MEGraph.MAUI.Charts.Line;assembly=MEGraph.MAUI"
              xmlns:viewmodel="clr-namespace:MEGraph.MAUITest.ViewModel;assembly=MEGraph.MAUITest"
              x:Class="MEGraph.MAUITest.MainPage">
     <ContentPage.Resources>
@@ -12,13 +13,27 @@
     <ContentPage.BindingContext>
         <StaticResource Key="MainViewModel"/>
     </ContentPage.BindingContext>
+    <ScrollView>
+        <VerticalStackLayout Padding="10" Spacing="20">
+            <!-- Grid chứa 2 chart nằm cạnh nhau -->
+            <Grid ColumnDefinitions="*,*">
+                <piecharts:PieChart 
+                x:Name="pieChart"
+                Data="{Binding PieData}"
+                ChartAxes="{Binding PieAxes}"
+                BackgroundColor="AliceBlue"
+                HeightRequest="200" />
+
+                <linecharts:LineChart 
+                x:Name="lineChart"
+                Grid.Column="1"
+                Data="{Binding PieData}"
+                ChartAxes="{Binding PieAxes}"
+                BackgroundColor="LightYellow"
+                HeightRequest="200" />
+            </Grid>
+        </VerticalStackLayout>
+    </ScrollView>
     
-    <charts:StackedLineChart 
-        x:Name="lineChart"
-        Title="{Binding ChartTitle}"
-        SeriesItems="{Binding SeriesCollection}"
-        ChartAxes="{Binding AxesCollection}"
-        BackgroundColor="White"
-        Margin="16"
-        />
+
 </ContentPage>

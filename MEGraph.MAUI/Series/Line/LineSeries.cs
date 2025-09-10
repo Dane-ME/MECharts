@@ -42,6 +42,7 @@ namespace MEGraph.MAUI.Series.Line
 
             canvas.StrokeColor = StrokeColor;
             canvas.StrokeSize = StrokeWidth;
+            canvas.StrokeLineJoin = LineJoin.Round;
             canvas.DrawPath(path);
         }
     }

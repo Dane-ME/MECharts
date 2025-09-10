@@ -51,10 +51,6 @@ namespace MEGraph.MAUI.Axes
         float TickInterval { get; set; }
         int TickCount { get; set; }
 
-        // === THUỘC TÍNH STYLING ===
-        AxisTextStyle LabelStyle { get; set; }
-        AxisTextStyle TitleStyle { get; set; }
-
         // === THUỘC TÍNH VỊ TRÍ ===
         float Position { get; set; }  // Vị trí trên trục (0-1)
         bool IsReversed { get; set; } // Đảo ngược hướng trục
