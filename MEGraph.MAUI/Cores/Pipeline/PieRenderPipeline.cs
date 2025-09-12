@@ -59,11 +59,20 @@ namespace MEGraph.MAUI.Cores.Pipeline
             {
                 foreach (var axis in chart.Axes)
                 {
-                    axis.Draw(canvas, dirtyRect, plotArea);
+                    axis.Draw(canvas, dirtyRect, plotArea, chart);
                 }
             }
 
             _seriesRenderer.Draw(canvas, plotArea, chart);
+
+            foreach (var axis in chart.Axes)
+            {
+                if (axis is Axes.Base baseaxis)
+                {
+                    baseaxis.DrawOverlay(canvas, dirtyRect, plotArea);
+                }
+            }
+
 
             // 6. Vẽ legend
             //_legendRenderer.Draw(canvas, dirtyRect, chart.Legend, chart.Series);

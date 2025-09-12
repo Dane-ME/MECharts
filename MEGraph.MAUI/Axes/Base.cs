@@ -12,7 +12,7 @@ namespace MEGraph.MAUI.Axes
 {
     public abstract class Base : IAxis
     {
-        private BaseChart? _baseChart;
+        protected BaseChart? _baseChart;
         // === THUỘC TÍNH CƠ BẢN ===
         public AxisTitle Title { get; set; } = new AxisTitle("");
         public List<AxisLabel> Labels { get; set; } = new();
@@ -112,7 +112,13 @@ namespace MEGraph.MAUI.Axes
         protected abstract void DrawAxisLine(ICanvas canvas, RectF plotArea);
         protected abstract void DrawLabels(ICanvas canvas, RectF plotArea);
         protected abstract void DrawTitle(ICanvas canvas, RectF outerArea, RectF plotArea);
-
+        //START - 2.1.3 - ADD - hit-test, cache and state hover  
+        // OVERLAY HOOK
+        public virtual void DrawOverlay(ICanvas canvas,RectF outerArea, RectF plotArea)
+        {
+            // Implementation cơ bản - override trong derived classes
+        }
+        //END - 2.1.3 - ADD - hit-test, cache and state hover
         // === VIRTUAL METHODS ===
         protected virtual void DrawGridLines(ICanvas canvas, RectF plotArea)
         {

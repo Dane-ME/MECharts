@@ -1,4 +1,5 @@
-﻿using MEGraph.MAUI.Styles;
+﻿using MEGraph.MAUI.Cores;
+using MEGraph.MAUI.Styles;
 using Microsoft.Maui.Graphics;
 using System;
 using System.Collections.Generic;
@@ -57,6 +58,8 @@ namespace MEGraph.MAUI.Axes
 
         // === METHODS ===
         void Draw(ICanvas canvas, RectF outerArea, RectF plotArea);
+        void Draw(ICanvas canvas, RectF outerArea, RectF plotArea, BaseChart chart);
+        void DrawOverlay(ICanvas canvas, RectF dirtyRect, RectF plotArea);
         void CalculateTicks();
         void UpdateLabels();
         void SetRange(float min, float max);

@@ -20,8 +20,41 @@ namespace MEGraph.MAUI.Charts.Pie
             ((BaseChart)this).Series.Add(Series);
 
             SetRenderPipeline(new Cores.Pipeline.PieRenderPipeline(this));
-        }
 
+            //START - 2.1.3 - ADD - hit-test, cache and state hover
+            StartInteraction += (s, e) =>
+            {
+                UpdateHover(new PointF((float)e.Touches[0].X, (float)e.Touches[0].Y));
+            };
+            DragInteraction += (s, e) =>
+            {
+                UpdateHover(new PointF((float)e.Touches[0].X, (float)e.Touches[0].Y));
+            };
+            EndInteraction += (s, e) =>
+            {
+                ClearHover();
+            };
+            //END - 2.1.3 - ADD - hit-test, cache and state hover
+        }
+        //START - 2.1.3 - ADD - hit-test, cache and state hover
+        private void UpdateHover(PointF p)
+        {
+            int hit = Series.HitTest(p);
+            if (hit != Series.SelectIndex)
+            {
+                Series.SelectIndex = hit;
+                this.Refresh();
+            }
+        }
+        private void ClearHover()
+        {
+            if (Series.SelectIndex != -1)
+            {
+                Series.SelectIndex = -1;
+                this.Refresh();
+            }
+        }
+        //END - 2.1.3 - ADD - hit-test, cache and state hover
         public void SetData(IEnumerable<float> data)
         {
             Series.Data = data.ToList();

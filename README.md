@@ -24,41 +24,6 @@ Add the NuGet package to your .NET MAUI project:
 
 ## ��️ Architecture
 
-### Core Components
-
-MEGraph.MAUI/
-├── Cores/ # Core rendering engine
-│ ├── BaseChart.cs # Base chart control
-│ ├── Pipeline/ # Rendering pipeline
-│ │ ├── IRenderPipeline.cs
-│ │ └── LineRenderPipeline.cs
-│ └── Components/ # Render components
-│ └── Line/
-│ └── Renderers/
-│ ├── Axes.cs
-│ ├── Series.cs
-│ ├── Title.cs
-│ └── Legend.cs
-├── Charts/ # Chart implementations
-│ ├── LineChart.cs
-│ └── Line/
-│ ├── Base.cs
-│ └── Line.cs
-├── Series/ # Data series
-│ ├── ISeries.cs
-│ └── LineSeries.cs
-├── Axes/ # Axis system
-│ ├── IAxis.cs
-│ ├── CategoryAxis.cs
-│ ├── ValueAxis.cs
-│ └── Line/
-│ ├── Category.cs
-│ └── Value.cs
-├── Legends/ # Legend system
-│ ├── ILegend.cs
-│ └── DefaultLegend.cs
-└── Title/ # Title system
-└── ITitle.cs
 
 ### Pipeline Architecture
 
