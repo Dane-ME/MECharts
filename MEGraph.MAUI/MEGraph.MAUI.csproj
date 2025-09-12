@@ -16,12 +16,7 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
 		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<Version>2.0.0</Version>
-		<Authors>Dane-ME</Authors>
-		<PackageProjectUrl>https://github.com/Dane-ME/MECharts</PackageProjectUrl>
-		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<PackageReleaseNotes>2.0.0</PackageReleaseNotes>
+
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -34,7 +29,6 @@
 	  <Folder Include="Axes\Bar\" />
 	  <Folder Include="Axes\Column\" />
 	  <Folder Include="Axes\Combo\" />
-	  <Folder Include="Axes\Pie\" />
 	  <Folder Include="Axes\Radar\" />
 	  <Folder Include="Axes\Stock\" />
 	  <Folder Include="Charts\Column\" />
@@ -43,9 +37,14 @@
 	  <Folder Include="Charts\Combo\" />
 	  <Folder Include="Charts\Radar\" />
 	  <Folder Include="Charts\Stock\" />
-	  <Folder Include="Charts\Pie\" />
 	  <Folder Include="Image\" />
-	  <Folder Include="Theme\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="..\README.md">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
 	</ItemGroup>
 
 	<ItemGroup>

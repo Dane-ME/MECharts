@@ -52,10 +52,8 @@ namespace MEGraph.MAUI.Cores.Components.Line.Stacked.Renderers
             float globalMaxY = accumulatedSums.Max();
             if (globalMaxY - globalMinY == 0) globalMaxY = globalMinY + 1;
 
-            // Mảng lưu giá trị đã cộng dồn
             var accumulated = new float[maxPoints];
 
-            // Vẽ từng series
             foreach (var series in stackedSeries)
             {
                 var baseValues = new List<float>();
