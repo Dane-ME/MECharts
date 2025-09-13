@@ -32,6 +32,11 @@ namespace MEGraph.MAUI.Axes
 
     public interface IAxis
     {
+        // START - 2.1.4 - ADD - Fix the issue where axes were lost when rendering multiple charts.
+        string ChartId { get; set; }
+        string Id { get; set; }
+        // END - 2.1.4 - ADD - Fix the issue where axes were lost when rendering multiple charts.
+
         // === THUỘC TÍNH CƠ BẢN ===
         AxisTitle Title { get; set; }
         List<AxisLabel> Labels { get; set; }

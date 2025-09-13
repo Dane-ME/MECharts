@@ -59,7 +59,14 @@ namespace MEGraph.MAUI.Cores.Pipeline
             {
                 foreach (var axis in chart.Axes)
                 {
-                    axis.Draw(canvas, dirtyRect, plotArea, chart);
+                    // START - 2.1.4 - EDIT - Fix the issue where axes were lost when rendering multiple charts.
+
+                    if (axis.Orientation == AxisOrientation.Angular)
+                    {
+                        axis.Draw(canvas, dirtyRect, plotArea, chart);
+                    }
+                    // END - 2.1.4 - EDIT - Fix the issue where axes were lost when rendering multiple charts.
+
                 }
             }
 
@@ -67,9 +74,9 @@ namespace MEGraph.MAUI.Cores.Pipeline
 
             foreach (var axis in chart.Axes)
             {
-                if (axis is Axes.Base baseaxis)
+                if (axis is Axes.Pie.Category pieCategory)
                 {
-                    baseaxis.DrawOverlay(canvas, dirtyRect, plotArea);
+                    pieCategory.DrawOverlay(canvas, dirtyRect, plotArea);
                 }
             }
 

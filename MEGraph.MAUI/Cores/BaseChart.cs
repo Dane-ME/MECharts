@@ -14,6 +14,10 @@ namespace MEGraph.MAUI.Cores
 {
     public abstract class BaseChart : GraphicsView, IDisposable
     {
+        // START - 2.1.4 - ADD - Fix the issue where axes were lost when rendering multiple charts.
+        public string Id { get; }
+        // END - 2.1.4 - ADD - Fix the issue where axes were lost when rendering multiple charts.
+
         private IRenderPipeline _renderPipeline;
         public List<ISeries> Series { get; } = new();
         public ObservableCollection<IAxis> Axes
@@ -26,7 +30,6 @@ namespace MEGraph.MAUI.Cores
             get => (ILegend)GetValue(LegendProperty);
             set => SetValue(LegendProperty, value);
         }
-        //public ChartOptions Options { get; set; } = new ChartOptions();
         public string Title
         {
             get => (string)GetValue(TitleProperty);
@@ -36,7 +39,11 @@ namespace MEGraph.MAUI.Cores
         public BaseChart()
         {
             SetRenderPipeline(null);
-
+            // START - 2.1.4 - ADD - Fix the issue where axes were lost when rendering multiple charts.
+            Id = Guid.NewGuid().GetHashCode().ToString("X"); 
+            Manager.AddChart(this);
+            // END - 2.1.4 - ADD - Fix the issue where axes were lost when rendering multiple charts.
+            // END - 2.1.4 - ADD - Fix the issue where axes were lost when rendering multiple charts.
             Unloaded += (s, e) => Dispose();
             Title = "Chart Title";
         }
@@ -92,7 +99,6 @@ namespace MEGraph.MAUI.Cores
 
             chart.Refresh();
         }
-
         public void Dispose()
         {
             if (_renderPipeline != null)
@@ -104,5 +110,8 @@ namespace MEGraph.MAUI.Cores
                 Drawable = null;
             }
         }
+
     }
+
+    
 }

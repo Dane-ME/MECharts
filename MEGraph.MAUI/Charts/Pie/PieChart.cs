@@ -156,13 +156,25 @@ namespace MEGraph.MAUI.Charts.Pie
 
         private void SyncAxesFromChartAxes(ObservableCollection<IAxis> chartAxes)
         {
-            Axes.Clear();
-            foreach (var axis in chartAxes)
-            {
-                Axes.Add(axis);
-            }
-        }
+            // START - 2.1.4 - EDIT - Fix the issue where axes were lost when rendering multiple charts.
 
+            if (Manager.GetBCManager().ContainsKey(this.Id))
+            {
+                for (int i = Axes.Count - 1; i >= 0; i--)
+                {
+                    if (Axes[i].ChartId == this.Id)
+                    {
+                        Axes.RemoveAt(i);
+                    }
+                }
+                foreach (var axis in chartAxes)
+                {
+                    axis.ChartId = this.Id;
+                    Axes.Add(axis);
+                }
+            }
+            // END - 2.1.4 - ADD - Fix the issue where axes were lost when rendering multiple charts.
+        }
         #endregion
     }
 }
