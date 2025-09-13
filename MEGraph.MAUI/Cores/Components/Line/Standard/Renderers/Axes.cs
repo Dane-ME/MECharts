@@ -19,7 +19,14 @@ namespace MEGraph.MAUI.Cores.Components.Line.Standard.Renderers
 
             foreach (var axis in baseChart.Axes)
             {
-                axis.Draw(canvas, outerArea, plotArea);
+                // START - 2.1.4 - EDIT - Fix the issue where axes were lost when rendering multiple charts.
+
+                if (axis.Orientation == AxisOrientation.X || axis.Orientation == AxisOrientation.Y)
+                {
+                    axis.Draw(canvas, outerArea, plotArea);
+                }
+                // END - 2.1.4 - EDIT - Fix the issue where axes were lost when rendering multiple charts.
+
             }
         }
 

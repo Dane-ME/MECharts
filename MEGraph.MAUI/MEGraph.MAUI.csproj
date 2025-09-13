@@ -23,9 +23,11 @@
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<RepositoryUrl>https://github.com/Dane-ME/MECharts</RepositoryUrl>
 		<PackageTags>Chart</PackageTags>
-		<PackageReleaseNotes>Fix issue where title and label styles could not be adjusted</PackageReleaseNotes>
+		<PackageReleaseNotes>Update Label for PieChart and Fix the issue where axes were lost when rendering multiple charts.</PackageReleaseNotes>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+		<AssemblyVersion>2.1.4</AssemblyVersion>
+		<FileVersion>$(AssemblyVersion)</FileVersion>
 	</PropertyGroup>
 
 	<ItemGroup>

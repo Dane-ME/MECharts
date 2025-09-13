@@ -28,10 +28,28 @@
                 x:Name="lineChart"
                 Grid.Column="1"
                 Data="{Binding PieData}"
-                ChartAxes="{Binding PieAxes}"
+                ChartAxes="{Binding LineAxes}"
                 BackgroundColor="LightYellow"
                 HeightRequest="200" />
+                
             </Grid>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Button
+                    Text="Add Data"
+                    Command="{Binding AddPieDataCommand}">
+                </Button>
+                <Button
+                    Text="Add Axes"
+                    Command="{Binding AddAxesCommand}"
+                    Grid.Row="1">                 
+                </Button>
+            </Grid>
+            
+            
         </VerticalStackLayout>
     </ScrollView>
     
