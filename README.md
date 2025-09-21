@@ -19,7 +19,7 @@ Note: Currently, only the standard, stacked line chart and pie chart is function
 Add the NuGet package to your .NET MAUI project:
 
 ```xml
-<PackageReference Include="MEGraph.MAUI" Version="2.0.0" />
+<PackageReference Include="MEGraph.MAUI" Version="2.2.0" />
 ```
 
 ## ��️ Architecture
