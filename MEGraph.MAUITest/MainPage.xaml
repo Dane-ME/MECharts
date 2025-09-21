@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:piecharts="clr-namespace:MEGraph.MAUI.Charts.Pie;assembly=MEGraph.MAUI"
              xmlns:linecharts="clr-namespace:MEGraph.MAUI.Charts.Line;assembly=MEGraph.MAUI"
+             xmlns:areacharts="clr-namespace:MEGraph.MAUI.Charts.Area;assembly=MEGraph.MAUI"
              xmlns:viewmodel="clr-namespace:MEGraph.MAUITest.ViewModel;assembly=MEGraph.MAUITest"
              x:Class="MEGraph.MAUITest.MainPage">
     <ContentPage.Resources>
@@ -16,7 +17,7 @@
     <ScrollView>
         <VerticalStackLayout Padding="10" Spacing="20">
             <!-- Grid chứa 2 chart nằm cạnh nhau -->
-            <Grid ColumnDefinitions="*,*">
+            <Grid ColumnDefinitions="*,*,*">
                 <piecharts:PieChart 
                 x:Name="pieChart"
                 Data="{Binding PieData}"
@@ -27,11 +28,19 @@
                 <linecharts:LineChart 
                 x:Name="lineChart"
                 Grid.Column="1"
-                Data="{Binding PieData}"
+                SeriesItems="{Binding LineSeries}"
                 ChartAxes="{Binding LineAxes}"
                 BackgroundColor="LightYellow"
                 HeightRequest="200" />
-                
+
+                <areacharts:AreaChart 
+                x:Name="areaChart"
+                Grid.Column="2"
+                SeriesItems="{Binding AreaSeries}"
+                ChartAxes="{Binding AreaAxes}"
+                BackgroundColor="WhiteSmoke"
+                HeightRequest="200" />
+
             </Grid>
             <Grid>
                 <Grid.RowDefinitions>
