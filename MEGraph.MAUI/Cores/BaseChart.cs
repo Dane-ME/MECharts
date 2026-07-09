@@ -1,4 +1,4 @@
-﻿using MEGraph.MAUI.Axes;
+using MEGraph.MAUI.Axes;
 using MEGraph.MAUI.Cores.Pipeline;
 using MEGraph.MAUI.Legends;
 using MEGraph.MAUI.Series;
@@ -101,6 +101,7 @@ namespace MEGraph.MAUI.Cores
         }
         public void Dispose()
         {
+            Manager.RemoveChart(Id);
             if (_renderPipeline != null)
             {
                 if (_renderPipeline is IDisposable disposablePipeline)
