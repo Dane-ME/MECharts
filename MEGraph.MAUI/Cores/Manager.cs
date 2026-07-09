@@ -1,4 +1,4 @@
-﻿// START - 2.1.4 - ADD - Fix the issue where axes were lost when rendering multiple charts.
+// START - 2.1.4 - ADD - Fix the issue where axes were lost when rendering multiple charts.
 using MEGraph.MAUI.Axes;
 using System;
 using System.Collections.Generic;
@@ -23,6 +23,14 @@ namespace MEGraph.MAUI.Cores
             if (!_baseChartManager.ContainsKey(chart.Id))
             {
                 _baseChartManager.Add(chart.Id, chart);
+            }
+        }
+        public static void RemoveChart(string id)
+        {
+            if (string.IsNullOrEmpty(id)) return;
+            if (_baseChartManager.ContainsKey(id))
+            {
+                _baseChartManager.Remove(id);
             }
         }
     }
