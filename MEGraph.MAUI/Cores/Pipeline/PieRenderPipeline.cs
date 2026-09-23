@@ -1,4 +1,4 @@
-﻿using MEGraph.MAUI.Axes;
+using MEGraph.MAUI.Axes;
 using MEGraph.MAUI.Axes.Pie;
 using System;
 using System.Collections.Generic;
@@ -81,8 +81,10 @@ namespace MEGraph.MAUI.Cores.Pipeline
             }
 
 
-            // 6. Vẽ legend
-            //_legendRenderer.Draw(canvas, dirtyRect, chart.Legend, chart.Series);
+            // 6. Vẽ legend (chỉ khi chart.Legend được set)
+            if (chart.Legend != null)
+                _legendRenderer.Draw(canvas, dirtyRect, chart.Series);
+
         }
 
         public void Draw(ICanvas canvas, RectF dirtyRect)

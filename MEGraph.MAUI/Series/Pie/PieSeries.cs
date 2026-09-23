@@ -1,4 +1,4 @@
-﻿using MEGraph.MAUI.Theme;
+using MEGraph.MAUI.Theme;
 using Microsoft.Maui.Graphics;
 using System;
 using System.Collections.Generic;
@@ -17,6 +17,8 @@ namespace MEGraph.MAUI.Series.Pie
         public float StrokeWidth { get; set; } = 0f;
         public bool Clockwise { get; set; } = false;
         public bool Closed { get; set; } = false;
+        // ISeries.Color — màu slice đầu tiên, dùng cho legend tổng hợp
+        public Color Color => Colors?.FirstOrDefault() ?? Microsoft.Maui.Graphics.Colors.Gray;
 
         public void Draw(ICanvas canvas, RectF plotArea)
         {

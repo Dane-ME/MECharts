@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,6 +13,10 @@ namespace MEGraph.MAUI.Series.Area
         public Color StrokeColor { get; set; } = Color.FromArgb("#5B9BD5");
         public Color? FillColor { get; set; } = Color.FromArgb("#D9E6F5");
         public float StrokeWidth { get; set; } = 3f;
+        // ISeries.Color — dùng FillColor nếu có, fallback StrokeColor
+        public Color Color => FillColor ?? StrokeColor;
+        public float GetMinY() => Data?.Any() == true ? Data.Min() : 0f;
+        public float GetMaxY() => Data?.Any() == true ? Data.Max() : 0f;
         public void Draw(ICanvas canvas, RectF plotArea)
         {
             Draw(canvas, plotArea, null, null);

@@ -1,4 +1,4 @@
-﻿using MEGraph.MAUI.Axes;
+using MEGraph.MAUI.Axes;
 using MEGraph.MAUI.Cores;
 using MEGraph.MAUI.Series.Area;
 using System;
@@ -193,14 +193,13 @@ namespace MEGraph.MAUI.Charts.Area
         private void SyncAxesFromChartAxes(ObservableCollection<IAxis> chartAxes)
         {
             // START - 2.1.4 - EDIT - Fix the issue where axes were lost when rendering multiple charts.
-            if (Manager.GetBCManager().ContainsKey(this.Id))
+            // START - 2.4.0 - EDIT - Dùng TryGetChart thay GetBCManager().ContainsKey
+            if (Manager.TryGetChart(this.Id, out _))
             {
                 for (int i = Axes.Count - 1; i >= 0; i--)
                 {
                     if (Axes[i].ChartId == this.Id)
-                    {
                         Axes.RemoveAt(i);
-                    }
                 }
                 foreach (var axis in chartAxes)
                 {
@@ -208,6 +207,7 @@ namespace MEGraph.MAUI.Charts.Area
                     Axes.Add(axis);
                 }
             }
+            // END - 2.4.0 - EDIT
             // END - 2.1.4 - EDIT - Fix the issue where axes were lost when rendering multiple charts.
         }
         #endregion

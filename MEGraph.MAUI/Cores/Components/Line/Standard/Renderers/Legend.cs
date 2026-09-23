@@ -1,19 +1,14 @@
 using MEGraph.MAUI.Legends;
 using MEGraph.MAUI.Series;
-using Microsoft.Maui.Graphics;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MEGraph.MAUI.Cores.Components.Line.Standard.Renderers
 {
     public class Legend : ILegend
     {
+        private readonly DefaultLegend _default = new();
+
         public void Draw(ICanvas canvas, RectF dirtyRect, IEnumerable<ISeries> series)
-        {
-            throw new NotImplementedException();
-        }
+            => _default.Draw(canvas, dirtyRect, series);
     }
 }

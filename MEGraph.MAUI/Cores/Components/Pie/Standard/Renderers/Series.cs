@@ -1,4 +1,4 @@
-﻿using MEGraph.MAUI.Series;
+using MEGraph.MAUI.Series;
 using MEGraph.MAUI.Series.Pie;
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace MEGraph.MAUI.Cores.Components.Pie.Standard.Renderers
 {
-    public class Series : ISeries
+    public class Series
     {
         private BaseChart? _baseChart;
         public string Name => _baseChart?.Title ?? "StackedLineSeriesRenderer";

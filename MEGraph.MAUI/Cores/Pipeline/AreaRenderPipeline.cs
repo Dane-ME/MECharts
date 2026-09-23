@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -57,8 +57,10 @@ namespace MEGraph.MAUI.Cores.Pipeline
             // 5. Vẽ series (Line chart specific)
             _seriesRenderer.Draw(canvas, plotArea, chart);
 
-            // 6. Vẽ legend
-            //_legendRenderer.Draw(canvas, dirtyRect, chart.Legend, chart.Series);
+            // 6. Vẽ legend (chỉ khi chart.Legend được set)
+            if (chart.Legend != null)
+                _legendRenderer.Draw(canvas, dirtyRect, chart.Series);
+
         }
         public RectF CalculatePlotArea(ICanvas canvas, RectF dirtyRect, BaseChart chart)
         {

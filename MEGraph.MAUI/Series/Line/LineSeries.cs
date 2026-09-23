@@ -1,4 +1,4 @@
-﻿using MEGraph.MAUI.Charts;
+using MEGraph.MAUI.Charts;
 using MEGraph.MAUI.Series;
 using System;
 using System.Collections.Generic;
@@ -12,6 +12,10 @@ namespace MEGraph.MAUI.Series.Line
         public List<float> Data { get; set; } = new();
         public Color StrokeColor { get; set; } = Color.FromArgb("#5B9BD5");
         public float StrokeWidth { get; set; } = 3f;
+        // ISeries.Color — map tới StrokeColor cho Legend
+        public Color Color => StrokeColor;
+        public float GetMinY() => Data?.Any() == true ? Data.Min() : 0f;
+        public float GetMaxY() => Data?.Any() == true ? Data.Max() : 0f;
         public void Draw(ICanvas canvas, RectF plotArea)
         {
             Draw(canvas, plotArea, null, null);
