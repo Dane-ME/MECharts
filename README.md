@@ -3,27 +3,31 @@
 A powerful and flexible charting library for .NET MAUI applications, built with modern architecture and pipeline-based rendering.
 
 Note: Currently, only Line, Stacked Line, Area, and Pie charts are functional. Other features will be added in future updates.
-## 🚀 Features
+## Features
 
-- **📊 Supported Chart Types**: Line, Stacked Line, Area, and Pie charts
-- **🗺️ Roadmap (Upcoming)**: Bar, Column, Combo, Radar, Stock charts
-- **🎨 Customizable Styling**: Colors, fonts, themes, and visual effects
-- **📱 Cross-Platform**: Android, iOS, macOS, Windows support
-- **⚡ High Performance**: Pipeline-based rendering for smooth animations
-- **🔗 Data Binding**: Full MVVM support with ObservableCollection
-- **🎯 Flexible Axes**: Category and Value axes with custom labels
-- **�� Multiple Series**: Support for multiple data series in one chart
-- **�� Themes**: Built-in light and dark themes
+- **Supported Chart Types**: Line, Stacked Line, Area, and Pie charts
+- **Roadmap (Upcoming)**: Bar, Column, Combo, Radar, Stock charts
+- **Customizable Styling**: Colors, fonts, themes, and visual effects
+- **Cross-Platform**: Android, iOS, macOS, Windows support
+- **High Performance**: Pipeline-based rendering for smooth animations
+- **Data Binding**: Full MVVM support with ObservableCollection
+- **Flexible Axes**: Category and Value axes with custom labels
+- **Draw-In Animations**: Built-in entry animation (draw-in effect) on load and dynamic data updates
+- **Smooth Spline Curves**: Monotone Cubic Spline (Fritsch-Carlson algorithm) via `IsSmooth = true` without overshoot
+- **Gradient Area Fill**: Beautiful fade gradients with `UseGradientFill = true` for Area charts
+- **Built-in Legend**: Automatic legend rendering for all supported chart types
+- **Multiple Series**: Support for multiple data series in one chart
+- **Themes**: Built-in light and dark themes
 
-## 📦 Installation
+## Installation
 
 Add the NuGet package to your .NET MAUI project:
 
 ```xml
-<PackageReference Include="MEGraph.MAUI" Version="2.2.0" />
+<PackageReference Include="MEGraph.MAUI" Version="2.4.0" />
 ```
 
-## ��️ Architecture
+## Architecture
 
 
 ### Pipeline Architecture
@@ -34,7 +38,48 @@ The library uses a modern pipeline-based rendering system:
 2. **Component Layer**: Individual renderers for different chart elements
 3. **Data Layer**: Series and axes data management
 
-## �� Quick Start
+## 💡 Key Capabilities (v2.4.0)
+
+### 1. Draw-In Animation
+Biểu đồ tự động thực hiện hiệu ứng vẽ dần từ trái sang phải khi vừa hiển thị hoặc khi cập nhật dữ liệu. Có thể cấu hình thời gian chạy (mili-giây) qua XAML hoặc code:
+
+```xml
+<linecharts:LineChart 
+    AnimationDuration="2500"
+    SeriesItems="{Binding SeriesCollection}"
+    ChartAxes="{Binding AxesCollection}" />
+```
+
+### 2. Smooth Curves (`IsSmooth`)
+Loại bỏ các góc nhọn trên đường vẽ, tự động bo cong mềm mại với giải thuật Fritsch-Carlson bảo toàn độ dốc (không bị lẹm trục):
+
+```csharp
+new LineSeries
+{
+    Name = "Smooth Line",
+    Data = new List<float> { 10, 40, 30, 70, 60, 90 },
+    StrokeColor = Colors.Teal,
+    StrokeWidth = 3,
+    IsSmooth = true // Bật đường cong mềm mại
+};
+```
+
+### 3. Gradient Area Fill (`UseGradientFill`)
+Tô màu chuyển sắc mờ dần từ đường đỉnh xuống đáy cho biểu đồ diện tích:
+
+```csharp
+new AreaSeries
+{
+    Name = "Area Gradient",
+    Data = new List<float> { 20, 60, 40, 80, 70, 100 },
+    StrokeColor = Colors.Green,
+    StrokeWidth = 2,
+    UseGradientFill = true, // Gradient chuyển từ màu viền mờ dần xuống đáy
+    IsSmooth = true
+};
+```
+
+## Quick Start
 
 ### 1. Basic Line Chart
 

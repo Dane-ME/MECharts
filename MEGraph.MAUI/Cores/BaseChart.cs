@@ -28,7 +28,7 @@ namespace MEGraph.MAUI.Cores
                 nameof(AnimationDuration),
                 typeof(uint),
                 typeof(BaseChart),
-                600u
+                2500u
             );
 
         public uint AnimationDuration
@@ -61,6 +61,7 @@ namespace MEGraph.MAUI.Cores
             Id = Guid.NewGuid().GetHashCode().ToString("X"); 
             Manager.AddChart(this);
             // END - 2.1.4 - ADD - Fix the issue where axes were lost when rendering multiple charts.
+            Loaded += (s, e) => PlayEntryAnimation();
             Unloaded += (s, e) => Dispose();
             Title = "Chart Title";
         }
@@ -85,7 +86,7 @@ namespace MEGraph.MAUI.Cores
                 end: 1d,
                 rate: 16u,
                 length: d,
-                easing: Easing.CubicOut,
+                easing: Easing.SinInOut,
                 finished: (v, cancelled) => { AnimationProgress = 1f; Invalidate(); }
             );
         }
