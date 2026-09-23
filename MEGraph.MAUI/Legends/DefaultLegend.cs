@@ -1,31 +1,45 @@
-﻿using MEGraph.MAUI.Series;
-using MEGraph.MAUI.Series.Line;
-using System;
+using MEGraph.MAUI.Series;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MEGraph.MAUI.Legends
 {
     public class DefaultLegend : ILegend
     {
+        public float SwatchSize { get; set; } = 10f;
+        public float FontSize { get; set; } = 12f;
+        public float ItemSpacing { get; set; } = 18f;
+        public float RightPadding { get; set; } = 8f;
+        public float TopPadding { get; set; } = 8f;
+
         public void Draw(ICanvas canvas, RectF dirtyRect, IEnumerable<ISeries> series)
         {
-            float x = dirtyRect.Right - 100;
-            float y = dirtyRect.Top + 20;
+            if (series == null) return;
 
-            foreach (var s in series)
+            // Đo width lớn nhất để xác định vị trí cột legend
+            float maxTextWidth = 0f;
+            var seriesList = new List<ISeries>(series);
+            foreach (var s in seriesList)
             {
-                // ô màu
-                canvas.FillColor = (s is LineSeries line) ? line.StrokeColor : Colors.Gray;
-                canvas.FillRectangle(x, y, 10, 10);
+                var sz = canvas.GetStringSize(s.Name, Microsoft.Maui.Graphics.Font.Default, FontSize);
+                if (sz.Width > maxTextWidth) maxTextWidth = sz.Width;
+            }
 
-                // tên
+            float colWidth = SwatchSize + 6f + maxTextWidth + RightPadding;
+            float x = dirtyRect.Right - colWidth;
+            float y = dirtyRect.Top + TopPadding;
+
+            foreach (var s in seriesList)
+            {
+                // Swatch màu — căn giữa dọc theo ItemSpacing
+                canvas.FillColor = s.Color;
+                canvas.FillRectangle(x, y + (ItemSpacing - SwatchSize) / 2f, SwatchSize, SwatchSize);
+
+                // Label tên series
                 canvas.FontColor = Colors.Black;
-                canvas.DrawString(s.Name, x + 15, y, HorizontalAlignment.Left);
+                canvas.FontSize = FontSize;
+                canvas.DrawString(s.Name, x + SwatchSize + 4f, y, HorizontalAlignment.Left);
 
-                y += 20;
+                y += ItemSpacing;
             }
         }
     }

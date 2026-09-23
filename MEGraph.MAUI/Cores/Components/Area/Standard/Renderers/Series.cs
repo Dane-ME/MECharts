@@ -1,4 +1,4 @@
-﻿using MEGraph.MAUI.Series;
+using MEGraph.MAUI.Series;
 using MEGraph.MAUI.Series.Area;
 using System;
 using System.Collections.Generic;
@@ -10,9 +10,7 @@ namespace MEGraph.MAUI.Cores.Components.Area.Standard.Renderers
 {
     public class Series
     {
-        private BaseChart? _baseChart;
-        public string Name => _baseChart?.Title ?? "Name is not exist!";
-
+        // START - 2.4.0 - EDIT - Fix duplicate min/max: dùng GetMinY/GetMaxY từ series.
         public void Draw(ICanvas canvas, RectF plotArea, BaseChart? baseChart)
         {
             if (baseChart == null) return;
@@ -23,25 +21,18 @@ namespace MEGraph.MAUI.Cores.Components.Area.Standard.Renderers
 
             if (allAreaSeries.Any())
             {
-                var allValues = allAreaSeries.SelectMany(s => s.Data).ToList();
-                if (allValues.Any())
-                {
-                    globalMinY = allValues.Min();
-                    globalMaxY = allValues.Max();
-                }
+                globalMinY = allAreaSeries.Min(s => s.GetMinY());
+                globalMaxY = allAreaSeries.Max(s => s.GetMaxY());
             }
 
             foreach (var series in baseChart.Series)
             {
                 if (series is AreaSeries areaSeries)
-                {
-                    areaSeries.Draw(canvas, plotArea, globalMinY, globalMaxY);
-                }
+                    areaSeries.Draw(canvas, plotArea, globalMinY, globalMaxY, baseChart.AnimationProgress);
                 else
-                {
                     series.Draw(canvas, plotArea);
-                }
             }
         }
+        // END - 2.4.0 - EDIT
     }
 }

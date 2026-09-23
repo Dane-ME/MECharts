@@ -15,14 +15,14 @@
         <StaticResource Key="MainViewModel"/>
     </ContentPage.BindingContext>
     <ScrollView>
-        <VerticalStackLayout Padding="10" Spacing="20">
+        <VerticalStackLayout Padding="10" Spacing="20" BackgroundColor="White">
             <!-- Grid chứa 2 chart nằm cạnh nhau -->
             <Grid ColumnDefinitions="*,*,*">
                 <piecharts:PieChart 
                 x:Name="pieChart"
                 Data="{Binding PieData}"
                 ChartAxes="{Binding PieAxes}"
-                BackgroundColor="AliceBlue"
+                BackgroundColor="Transparent"
                 HeightRequest="200" />
 
                 <linecharts:LineChart 
@@ -30,7 +30,7 @@
                 Grid.Column="1"
                 SeriesItems="{Binding LineSeries}"
                 ChartAxes="{Binding LineAxes}"
-                BackgroundColor="LightYellow"
+                BackgroundColor="Transparent"
                 HeightRequest="200" />
 
                 <areacharts:AreaChart 
@@ -38,7 +38,7 @@
                 Grid.Column="2"
                 SeriesItems="{Binding AreaSeries}"
                 ChartAxes="{Binding AreaAxes}"
-                BackgroundColor="WhiteSmoke"
+                BackgroundColor="Transparent"
                 HeightRequest="200" />
 
             </Grid>

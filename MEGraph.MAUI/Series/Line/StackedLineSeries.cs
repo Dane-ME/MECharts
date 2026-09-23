@@ -1,4 +1,4 @@
-﻿using MEGraph.MAUI.Charts;
+using MEGraph.MAUI.Charts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +13,12 @@ namespace MEGraph.MAUI.Series.Line
         public Color FillColor { get; set; } = Color.FromArgb("#5B9BD5");
         public float StrokeWidth { get; set; } = 3f;
         public float FillOpacity { get; set; } = 0.3f;
+
+        // START - 2.4.0 - ADD - ISeries.Color & helper min/max
+        public Color Color => StrokeColor;
+        public float GetMinY() => Data?.Any() == true ? Data.Min() : 0f;
+        public float GetMaxY() => Data?.Any() == true ? Data.Max() : 0f;
+        // END - 2.4.0 - ADD
 
         // Vị trí trong stack
         public int StackOrder { get; set; } = 0;
