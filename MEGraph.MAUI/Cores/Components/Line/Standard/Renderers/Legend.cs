@@ -1,5 +1,6 @@
-﻿using MEGraph.MAUI.Legends;
+using MEGraph.MAUI.Legends;
 using MEGraph.MAUI.Series;
+using Microsoft.Maui.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;

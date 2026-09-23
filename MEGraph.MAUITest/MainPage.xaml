@@ -22,7 +22,7 @@
                 x:Name="pieChart"
                 Data="{Binding PieData}"
                 ChartAxes="{Binding PieAxes}"
-                BackgroundColor="AliceBlue"
+                BackgroundColor="Transparent"
                 HeightRequest="200" />
 
                 <linecharts:LineChart 
@@ -30,7 +30,7 @@
                 Grid.Column="1"
                 SeriesItems="{Binding LineSeries}"
                 ChartAxes="{Binding LineAxes}"
-                BackgroundColor="LightYellow"
+                BackgroundColor="Transparent"
                 HeightRequest="200" />
 
                 <areacharts:AreaChart 
@@ -38,7 +38,7 @@
                 Grid.Column="2"
                 SeriesItems="{Binding AreaSeries}"
                 ChartAxes="{Binding AreaAxes}"
-                BackgroundColor="WhiteSmoke"
+                BackgroundColor="Transparent"
                 HeightRequest="200" />
 
             </Grid>
