@@ -19,6 +19,24 @@ namespace MEGraph.MAUI.Cores
         // END - 2.1.4 - ADD - Fix the issue where axes were lost when rendering multiple charts.
 
         private IRenderPipeline _renderPipeline;
+
+        // START - 2.5.0 - ADD - Animation support
+        public float AnimationProgress { get; private set; } = 1f;
+
+        public static readonly BindableProperty AnimationDurationProperty =
+            BindableProperty.Create(
+                nameof(AnimationDuration),
+                typeof(uint),
+                typeof(BaseChart),
+                600u
+            );
+
+        public uint AnimationDuration
+        {
+            get => (uint)GetValue(AnimationDurationProperty);
+            set => SetValue(AnimationDurationProperty, value);
+        }
+        // END - 2.5.0 - ADD
         public List<ISeries> Series { get; } = new();
         public ObservableCollection<IAxis> Axes
         {
@@ -43,12 +61,35 @@ namespace MEGraph.MAUI.Cores
             Id = Guid.NewGuid().GetHashCode().ToString("X"); 
             Manager.AddChart(this);
             // END - 2.1.4 - ADD - Fix the issue where axes were lost when rendering multiple charts.
-            // END - 2.1.4 - ADD - Fix the issue where axes were lost when rendering multiple charts.
             Unloaded += (s, e) => Dispose();
             Title = "Chart Title";
         }
 
         public void Refresh() => this.Invalidate();
+
+        // START - 2.5.0 - ADD
+        public void PlayEntryAnimation(uint? duration = null)
+        {
+            uint d = duration ?? AnimationDuration;
+            if (d == 0)
+            {
+                AnimationProgress = 1f;
+                Refresh();
+                return;
+            }
+            AnimationProgress = 0f;
+            this.Animate(
+                name: "chart_entry",
+                callback: v => { AnimationProgress = (float)v; Invalidate(); },
+                start: 0d,
+                end: 1d,
+                rate: 16u,
+                length: d,
+                easing: Easing.CubicOut,
+                finished: (v, cancelled) => { AnimationProgress = 1f; Invalidate(); }
+            );
+        }
+        // END - 2.5.0 - ADD
 
         public virtual void SetRenderPipeline(IRenderPipeline? pipeline)
         {

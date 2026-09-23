@@ -52,7 +52,7 @@ namespace MEGraph.MAUI.Charts.Area
             if (newValue is IEnumerable<float> values)
             {
                 chart.Series.Data = values.ToList();
-                chart.Refresh();
+                chart.PlayEntryAnimation();
             }
         }
 
@@ -70,7 +70,7 @@ namespace MEGraph.MAUI.Charts.Area
             if (Data != null)
             {
                 Series.Data = Data.ToList();
-                Refresh();
+                PlayEntryAnimation();
             }
         }
         #endregion
@@ -115,7 +115,7 @@ namespace MEGraph.MAUI.Charts.Area
                 ((BaseChart)chart).Series.Add(chart.Series);
             }
 
-            chart.Refresh();
+            chart.PlayEntryAnimation();
         }
 
         private void OnSeriesCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -123,7 +123,7 @@ namespace MEGraph.MAUI.Charts.Area
             if (sender is ObservableCollection<AreaSeries> items)
             {
                 SyncSeriesFromItems(items);
-                Refresh();
+                PlayEntryAnimation();
             }
         }
 

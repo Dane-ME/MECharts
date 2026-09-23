@@ -1,4 +1,4 @@
-﻿using MEGraph.MAUI.Axes;
+using MEGraph.MAUI.Axes;
 using MEGraph.MAUI.Axes.Pie;
 using MEGraph.MAUI.Series.Area;
 using MEGraph.MAUI.Series.Line;
@@ -61,23 +61,26 @@ namespace MEGraph.MAUITest.ViewModel
         {
             PieData = new ObservableCollection<float> { 50, 20, 10, 25, 5, 5 };
 
-            LineSeries = new ObservableCollection<LineSeries>
+            // Thêm điểm vào LineSeries hiện tại (kèm điểm mới > 100 vượt thang đo cũ)
+            if (LineSeries != null)
             {
-                new LineSeries
+                foreach (var s in LineSeries)
                 {
-                    Name = "Series 1",
-                    Data = new List<float>{ 10, 100, 30, 90, 60, 80 },
-                    StrokeColor = Colors.Green,
-                    StrokeWidth = 2
-                },
-                new LineSeries
-                {
-                    Name = "Series 2",
-                    Data = new List<float>{ 30, 150, 10, 45, 30, 35 },
-                    StrokeColor = Colors.Red,
-                    StrokeWidth= 2,
+                    s.Data.Add((float)Random.Shared.Next(10, 120));
                 }
-            };
+                // Re-assign để trigger binding update
+                LineSeries = new ObservableCollection<LineSeries>(LineSeries);
+            }
+
+            // Thêm điểm vào AreaSeries hiện tại
+            if (AreaSeries != null)
+            {
+                foreach (var s in AreaSeries)
+                {
+                    s.Data.Add((float)Random.Shared.Next(10, 120));
+                }
+                AreaSeries = new ObservableCollection<AreaSeries>(AreaSeries);
+            }
         });
         public ICommand AddAxesCommand => new Command(() =>
         {
@@ -148,7 +151,8 @@ namespace MEGraph.MAUITest.ViewModel
                     Name = "Series 1",
                     Data = new List<float>{ 10, 40, 30, 70, 60, 90 },
                     StrokeColor = Colors.Green,
-                    StrokeWidth = 2
+                    StrokeWidth = 2,
+                    IsSmooth = true, // Bo cong mềm mại
                 },
                 new LineSeries
                 {
@@ -156,6 +160,7 @@ namespace MEGraph.MAUITest.ViewModel
                     Data = new List<float>{ 30, 20, 10, 45, 5, 5 },
                     StrokeColor = Colors.Red,
                     StrokeWidth= 2,
+                    IsSmooth = true, // Bo cong mềm mại
                 }
             };
 
@@ -205,17 +210,19 @@ namespace MEGraph.MAUITest.ViewModel
                 {
                     Name = "Area Series 1",
                     Data = new List<float>{ 20, 60, 40, 80, 70, 100 },
-                    FillColor = Colors.LightBlue,
-                    StrokeColor = Colors.Blue,
+                    StrokeColor = Colors.White,
                     StrokeWidth = 2,
+                    UseGradientFill = true,
+                    IsSmooth = true, // Bo cong mềm mại
                 },
                 new AreaSeries
                 {
                     Name = "Area Series 2",
                     Data = new List<float>{ 10, 40, 30, 70, 60, 90 },
-                    FillColor = Colors.LightGreen,
-                    StrokeColor = Colors.Green,
+                    StrokeColor = Color.FromArgb("#4CAF50"),
                     StrokeWidth= 2,
+                    UseGradientFill = true,
+                    IsSmooth = true, // Bo cong mềm mại
                 }
             };
 

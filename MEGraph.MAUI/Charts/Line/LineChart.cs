@@ -39,7 +39,7 @@ namespace MEGraph.MAUI.Charts.Line
         public void SetData(IEnumerable<float> data)
         {
             Series.Data = data.ToList();
-            Refresh();
+            PlayEntryAnimation();
         }
 
         #region Support Bindable Data
@@ -67,7 +67,7 @@ namespace MEGraph.MAUI.Charts.Line
             if (newValue is IEnumerable<float> values)
             {
                 chart.Series.Data = values.ToList();
-                chart.Refresh();
+                chart.PlayEntryAnimation();
             }
         }
 
@@ -85,7 +85,7 @@ namespace MEGraph.MAUI.Charts.Line
             if (Data != null)
             {
                 Series.Data = Data.ToList();
-                Refresh();
+                PlayEntryAnimation();
             }
         }
         #endregion
@@ -130,7 +130,7 @@ namespace MEGraph.MAUI.Charts.Line
                 ((BaseChart)chart).Series.Add(chart.Series);
             }
 
-            chart.Refresh();
+            chart.PlayEntryAnimation();
         }
 
         private void OnSeriesCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -138,7 +138,7 @@ namespace MEGraph.MAUI.Charts.Line
             if (sender is ObservableCollection<LineSeries> items)
             {
                 SyncSeriesFromItems(items);
-                Refresh();
+                PlayEntryAnimation();
             }
         }
 

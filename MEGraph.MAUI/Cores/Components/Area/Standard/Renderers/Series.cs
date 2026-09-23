@@ -28,7 +28,7 @@ namespace MEGraph.MAUI.Cores.Components.Area.Standard.Renderers
             foreach (var series in baseChart.Series)
             {
                 if (series is AreaSeries areaSeries)
-                    areaSeries.Draw(canvas, plotArea, globalMinY, globalMaxY);
+                    areaSeries.Draw(canvas, plotArea, globalMinY, globalMaxY, baseChart.AnimationProgress);
                 else
                     series.Draw(canvas, plotArea);
             }
