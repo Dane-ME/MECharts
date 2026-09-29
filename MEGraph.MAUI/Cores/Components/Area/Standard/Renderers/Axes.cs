@@ -1,4 +1,4 @@
-﻿using MEGraph.MAUI.Axes;
+using MEGraph.MAUI.Axes;
 using MEGraph.MAUI.Axes.Area;
 using System;
 using System.Collections.Generic;
@@ -17,23 +17,25 @@ namespace MEGraph.MAUI.Cores.Components.Area.Standard.Renderers
 
             foreach (var axis in baseChart.Axes)
             {
-                // START - 2.1.4 - EDIT - Fix the issue where axes were lost when rendering multiple charts.
-
-                if (axis.Orientation == AxisOrientation.X || axis.Orientation == AxisOrientation.Y)
+                if (axis.ChartId == baseChart.Id || string.IsNullOrEmpty(axis.ChartId))
                 {
-                    axis.Draw(canvas, outerArea, plotArea);
+                    if (axis.Orientation == AxisOrientation.X || axis.Orientation == AxisOrientation.Y)
+                    {
+                        axis.Draw(canvas, outerArea, plotArea);
+                    }
                 }
-                // END - 2.1.4 - EDIT - Fix the issue where axes were lost when rendering multiple charts.
-
             }
         }
 
-        public (float Left, float Top, float Right, float Bottom) CalculateMargins(ICanvas canvas, RectF outerArea, ObservableCollection<IAxis> axes)
+        public (float Left, float Top, float Right, float Bottom) CalculateMargins(ICanvas canvas, RectF outerArea, ObservableCollection<IAxis> axes, string? chartId = null)
         {
             float top = 0, left = 0, right = 20, bottom = 0;
 
             foreach (var axis in axes)
             {
+                if (chartId != null && !string.IsNullOrEmpty(axis.ChartId) && axis.ChartId != chartId)
+                    continue;
+
                 if (axis is Category categoryAxis && categoryAxis.Orientation == AxisOrientation.X)
                 {
                     bottom = CalculateCategoryAxisMargin(canvas, categoryAxis, bottom);
@@ -67,7 +69,8 @@ namespace MEGraph.MAUI.Cores.Components.Area.Standard.Renderers
                 : canvas.GetStringSize(categoryAxis.Title.Content, categoryAxis.Title.Font, categoryAxis.Title.FontSize);
 
             float padding = 5;
-            return Math.Max(currentBottom, maxLabelHeight + maxLabelMargin + padding + titleSize.Height + categoryAxis.Title.Margin);
+            float calculated = maxLabelHeight + maxLabelMargin + padding + titleSize.Height + categoryAxis.Title.Margin;
+            return Math.Max(currentBottom, (float)Math.Ceiling(calculated));
         }
 
         private float CalculateValueAxisMargin(ICanvas canvas, Value valueAxis, float currentLeft)
@@ -87,7 +90,8 @@ namespace MEGraph.MAUI.Cores.Components.Area.Standard.Renderers
                 ? new SizeF(0, 0)
                 : canvas.GetStringSize(valueAxis.Title.Content, valueAxis.Title.Font, valueAxis.Title.FontSize);
 
-            return Math.Max(currentLeft, maxWidth + 10 + titleSize.Height);
+            float calculated = maxWidth + 10 + titleSize.Height;
+            return Math.Max(currentLeft, (float)Math.Ceiling(calculated));
         }
     }
 }

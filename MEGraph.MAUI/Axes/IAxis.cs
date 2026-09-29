@@ -56,6 +56,9 @@ namespace MEGraph.MAUI.Axes
         float MaxValue { get; set; }
         float TickInterval { get; set; }
         int TickCount { get; set; }
+        bool IsAutoRange { get; set; }
+        bool AutoSkip { get; set; }
+        int TotalPoints { get; set; }
 
         // === THUỘC TÍNH VỊ TRÍ ===
         float Position { get; set; }  // Vị trí trên trục (0-1)
@@ -67,6 +70,7 @@ namespace MEGraph.MAUI.Axes
         void DrawOverlay(ICanvas canvas, RectF dirtyRect, RectF plotArea);
         void CalculateTicks();
         void UpdateLabels();
+        void ApplyAutoRange(float dataMin, float dataMax, int targetTickCount = 5);
         void SetRange(float min, float max);
         void SetTickInterval(float interval);
         void SetTickCount(int count);

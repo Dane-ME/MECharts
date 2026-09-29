@@ -60,6 +60,7 @@ namespace MEGraph.MAUI.Cores
             // START - 2.1.4 - ADD - Fix the issue where axes were lost when rendering multiple charts.
             Id = Guid.NewGuid().GetHashCode().ToString("X"); 
             Manager.AddChart(this);
+            Axes = new ObservableCollection<IAxis>();
             // END - 2.1.4 - ADD - Fix the issue where axes were lost when rendering multiple charts.
             Loaded += (s, e) => PlayEntryAnimation();
             Unloaded += (s, e) => Dispose();
@@ -71,6 +72,7 @@ namespace MEGraph.MAUI.Cores
         // START - 2.5.0 - ADD
         public void PlayEntryAnimation(uint? duration = null)
         {
+            this.AbortAnimation("chart_entry");
             uint d = duration ?? AnimationDuration;
             if (d == 0)
             {
@@ -126,7 +128,8 @@ namespace MEGraph.MAUI.Cores
         nameof(Axes),
         typeof(ObservableCollection<IAxis>),
         typeof(BaseChart),
-        new ObservableCollection<IAxis>(),
+        null,
+        defaultValueCreator: _ => new ObservableCollection<IAxis>(),
         propertyChanged: OnAxesChanged);
 
         private static void OnAxesChanged(BindableObject bindable, object oldValue, object newValue)
