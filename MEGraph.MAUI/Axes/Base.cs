@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -32,6 +32,9 @@ namespace MEGraph.MAUI.Axes
         public float MaxValue { get; set; } = 100f;
         public float TickInterval { get; set; } = 10f;
         public int TickCount { get; set; } = 5;
+        public bool IsAutoRange { get; set; } = true;
+        public bool AutoSkip { get; set; } = true;
+        public int TotalPoints { get; set; } = 0;
 
         // === THUỘC TÍNH VỊ TRÍ ===
         public float Position { get; set; } = 0f;
@@ -86,6 +89,79 @@ namespace MEGraph.MAUI.Axes
         public virtual void UpdateLabels()
         {
             CalculateTicks();
+        }
+
+        public virtual void ApplyAutoRange(float dataMin, float dataMax, int targetTickCount = 5)
+        {
+            if (!IsAutoRange) return;
+
+            // Xử lý edge case khi data min == max hoặc không hợp lệ
+            if (float.IsNaN(dataMin) || float.IsInfinity(dataMin) ||
+                float.IsNaN(dataMax) || float.IsInfinity(dataMax))
+            {
+                dataMin = 0f;
+                dataMax = 100f;
+            }
+
+            if (Math.Abs(dataMax - dataMin) < 1e-4f)
+            {
+                if (Math.Abs(dataMin) < 1e-4f)
+                {
+                    dataMin = 0f;
+                    dataMax = 10f;
+                }
+                else
+                {
+                    float pad = Math.Abs(dataMin) * 0.2f;
+                    dataMin -= pad;
+                    dataMax += pad;
+                }
+            }
+
+            // Neo đáy về 0 nếu dữ liệu toàn số dương và điểm min không quá xa 0
+            if (dataMin >= 0f && dataMin < dataMax * 0.5f)
+            {
+                dataMin = 0f;
+            }
+
+            float rawRange = dataMax - dataMin;
+            targetTickCount = Math.Max(2, targetTickCount);
+            float rawSpacing = rawRange / (targetTickCount - 1);
+
+            double exponent = Math.Floor(Math.Log10(rawSpacing));
+            double fraction = rawSpacing / Math.Pow(10, exponent);
+
+            double niceFraction;
+            if (fraction <= 1.2) niceFraction = 1.0;
+            else if (fraction <= 2.5) niceFraction = 2.0;
+            else if (fraction <= 7.0) niceFraction = 5.0;
+            else niceFraction = 10.0;
+
+            float niceSpacing = (float)(niceFraction * Math.Pow(10, exponent));
+            if (niceSpacing <= 0) niceSpacing = 1f;
+
+            float niceMin = (float)(Math.Floor(dataMin / niceSpacing) * niceSpacing);
+            float niceMax = (float)(Math.Ceiling(dataMax / niceSpacing) * niceSpacing);
+
+            if (niceMax <= niceMin)
+            {
+                niceMax = niceMin + niceSpacing;
+            }
+
+            MinValue = niceMin;
+            MaxValue = niceMax;
+            TickInterval = niceSpacing;
+
+            Labels.Clear();
+            string format = (niceSpacing >= 1f && Math.Abs(niceSpacing - Math.Round(niceSpacing)) < 0.001) ? "F0" : "F1";
+
+            for (float val = niceMin; val <= niceMax + (niceSpacing * 0.01f); val += niceSpacing)
+            {
+                Labels.Add(new AxisLabel(val.ToString(format)));
+            }
+
+            TickCount = Labels.Count;
+            OnAxisChanged(nameof(Labels), null, Labels);
         }
 
         public virtual void SetRange(float min, float max)

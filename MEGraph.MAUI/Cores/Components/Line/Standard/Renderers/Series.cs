@@ -14,20 +14,35 @@ namespace MEGraph.MAUI.Cores.Components.Line.Standard.Renderers
 
             var allLineSeries = baseChart.Series.OfType<LineSeries>().ToList();
 
-            // Tính globalMin/Max một lần từ series — tránh mỗi series tự tính riêng
-            float? globalMinY = null;
-            float? globalMaxY = null;
+            // Lấy min/max từ trục Value nếu có để đồng bộ hoàn toàn với vạch trục
+            var valueAxis = baseChart.Axes?.FirstOrDefault(a => a.Orientation == MEGraph.MAUI.Axes.AxisOrientation.Y);
+            float? globalMinY = valueAxis?.MinValue;
+            float? globalMaxY = valueAxis?.MaxValue;
 
-            if (allLineSeries.Any())
+            if (globalMinY == null || globalMaxY == null)
             {
-                globalMinY = allLineSeries.Min(s => s.GetMinY());
-                globalMaxY = allLineSeries.Max(s => s.GetMaxY());
+                if (allLineSeries.Any())
+                {
+                    globalMinY = allLineSeries.Min(s => s.GetMinY());
+                    globalMaxY = allLineSeries.Max(s => s.GetMaxY());
+                }
+            }
+
+            var categoryAxis = baseChart.Axes?.FirstOrDefault(a => a.Orientation == MEGraph.MAUI.Axes.AxisOrientation.X);
+            int? totalPoints = null;
+            if (categoryAxis != null && categoryAxis.TotalPoints > 0)
+            {
+                totalPoints = categoryAxis.TotalPoints;
+            }
+            else if (allLineSeries.Any())
+            {
+                totalPoints = allLineSeries.Max(s => s.Data?.Count ?? 0);
             }
 
             foreach (var series in baseChart.Series)
             {
                 if (series is LineSeries lineSeries)
-                    lineSeries.Draw(canvas, plotArea, globalMinY, globalMaxY, baseChart.AnimationProgress);
+                    lineSeries.Draw(canvas, plotArea, globalMinY, globalMaxY, baseChart.AnimationProgress, totalPoints);
                 else
                     series.Draw(canvas, plotArea);
             }

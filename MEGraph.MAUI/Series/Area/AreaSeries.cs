@@ -36,13 +36,17 @@ namespace MEGraph.MAUI.Series.Area
         {
             Draw(canvas, plotArea, globalMinY, globalMaxY, 1f);
         }
-        public void Draw(ICanvas canvas, RectF plotArea, float? globalMinY, float? globalMaxY, float progress)
+        public void Draw(ICanvas canvas, RectF plotArea, float? globalMinY, float? globalMaxY, float progress, int? totalPoints = null)
         {
-            if (Data == null || Data.Count < 2) return;
+            if (Data == null || Data.Count == 0) return;
 
-            float stepX = plotArea.Width / (Data.Count - 1);
-            float maxY = globalMaxY ?? Data.Max();
-            float minY = globalMinY ?? Data.Min();
+            int countForStep = (totalPoints.HasValue && totalPoints.Value > 1) 
+                ? totalPoints.Value 
+                : Math.Max(2, Data.Count);
+
+            float stepX = plotArea.Width / (countForStep - 1);
+            float maxY = globalMaxY ?? (Data.Any() ? Data.Max() : 100f);
+            float minY = globalMinY ?? (Data.Any() ? Data.Min() : 0f);
             float rangeY = (maxY - minY == 0) ? 1 : maxY - minY;
 
             canvas.Antialias = true;
@@ -50,9 +54,16 @@ namespace MEGraph.MAUI.Series.Area
             var points = new PointF[Data.Count];
             for (int i = 0; i < Data.Count; i++)
             {
-                float x = plotArea.Left + (i * stepX);
+                float x = (countForStep <= 1) ? plotArea.Center.X : plotArea.Left + (i * stepX);
                 float y = plotArea.Bottom - ((Data[i] - minY) / rangeY * plotArea.Height);
                 points[i] = new PointF(x, y);
+            }
+
+            if (points.Length == 1)
+            {
+                canvas.FillColor = StrokeColor;
+                canvas.FillCircle(points[0], StrokeWidth * 1.5f);
+                return;
             }
 
             var path = new PathF();

@@ -5,6 +5,7 @@
 
 # Ignore test project
 MEGraph.MAUITest/
+MEGraph.Test/
 
 # User-specific files
 *.rsuser

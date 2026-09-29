@@ -16,19 +16,30 @@ namespace MEGraph.MAUI.Cores.Components.Area.Standard.Renderers
             if (baseChart == null) return;
 
             var allAreaSeries = baseChart.Series.OfType<AreaSeries>().ToList();
-            float? globalMinY = null;
-            float? globalMaxY = null;
+            
+            // Lấy min/max từ trục Value nếu có để đồng bộ hoàn toàn với vạch trục
+            var valueAxis = baseChart.Axes?.FirstOrDefault(a => a.Orientation == MEGraph.MAUI.Axes.AxisOrientation.Y);
+            float? globalMinY = valueAxis?.MinValue;
+            float? globalMaxY = valueAxis?.MaxValue;
 
-            if (allAreaSeries.Any())
+            if (globalMinY == null || globalMaxY == null)
             {
-                globalMinY = allAreaSeries.Min(s => s.GetMinY());
-                globalMaxY = allAreaSeries.Max(s => s.GetMaxY());
+                if (allAreaSeries.Any())
+                {
+                    globalMinY = allAreaSeries.Min(s => s.GetMinY());
+                    globalMaxY = allAreaSeries.Max(s => s.GetMaxY());
+                }
             }
+
+            var categoryAxis = baseChart.Axes?.FirstOrDefault(a => a.Orientation == MEGraph.MAUI.Axes.AxisOrientation.X);
+            int? totalPoints = categoryAxis?.TotalPoints > 0 
+                ? categoryAxis.TotalPoints 
+                : (allAreaSeries.Any() ? allAreaSeries.Max(s => s.Data?.Count ?? 0) : null);
 
             foreach (var series in baseChart.Series)
             {
                 if (series is AreaSeries areaSeries)
-                    areaSeries.Draw(canvas, plotArea, globalMinY, globalMaxY, baseChart.AnimationProgress);
+                    areaSeries.Draw(canvas, plotArea, globalMinY, globalMaxY, baseChart.AnimationProgress, totalPoints);
                 else
                     series.Draw(canvas, plotArea);
             }
