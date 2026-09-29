@@ -25,7 +25,10 @@ namespace MEGraph.MAUI.Cores.Components.Pie.Standard.Renderers
                 .OfType<PieSeries>()
                 .SingleOrDefault();
 
-            pieSeries?.Draw(canvas, plotArea);
+            if (pieSeries != null && pieSeries.IsVisible)
+            {
+                pieSeries.Draw(canvas, plotArea);
+            }
         }
     }
 }

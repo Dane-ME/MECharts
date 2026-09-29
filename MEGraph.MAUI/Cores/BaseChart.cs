@@ -69,6 +69,32 @@ namespace MEGraph.MAUI.Cores
 
         public void Refresh() => this.Invalidate();
 
+        /// <summary>
+        /// Ẩn hoặc hiện một Series theo tên và cập nhật lại giao diện.
+        /// </summary>
+        public void SetSeriesVisibility(string seriesName, bool isVisible)
+        {
+            var series = Series.FirstOrDefault(s => string.Equals(s.Name, seriesName, StringComparison.OrdinalIgnoreCase));
+            if (series != null && series.IsVisible != isVisible)
+            {
+                series.IsVisible = isVisible;
+                Refresh();
+            }
+        }
+
+        /// <summary>
+        /// Bật/tắt trạng thái hiển thị của một Series và cập nhật lại giao diện.
+        /// </summary>
+        public void ToggleSeries(string seriesName)
+        {
+            var series = Series.FirstOrDefault(s => string.Equals(s.Name, seriesName, StringComparison.OrdinalIgnoreCase));
+            if (series != null)
+            {
+                series.IsVisible = !series.IsVisible;
+                Refresh();
+            }
+        }
+
         // START - 2.5.0 - ADD
         public void PlayEntryAnimation(uint? duration = null)
         {

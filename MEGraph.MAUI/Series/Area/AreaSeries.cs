@@ -9,6 +9,7 @@ namespace MEGraph.MAUI.Series.Area
     public class AreaSeries : ISeries
     {
         public string Name { get; set; } = "AreaSeries";
+        public bool IsVisible { get; set; } = true;
         public List<float> Data { get; set; } = new();
         public Color StrokeColor { get; set; } = Color.FromArgb("#5B9BD5");
         public Color? FillColor { get; set; } = Color.FromArgb("#D9E6F5");

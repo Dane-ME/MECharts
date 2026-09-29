@@ -9,6 +9,7 @@ namespace MEGraph.MAUI.Series.Line
     public class LineSeries : ISeries
     {
         public string Name { get; set; } = "LineSeries";
+        public bool IsVisible { get; set; } = true;
         public List<float> Data { get; set; } = new();
         public Color StrokeColor { get; set; } = Color.FromArgb("#5B9BD5");
         public float StrokeWidth { get; set; } = 3f;

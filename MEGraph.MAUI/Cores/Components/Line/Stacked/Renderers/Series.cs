@@ -26,6 +26,7 @@ namespace MEGraph.MAUI.Cores.Components.Line.Stacked.Renderers
 
             var stackedSeries = _baseChart.Series
                 .OfType<StackedLineSeries>()
+                .Where(s => s.IsVisible)
                 .OrderBy(s => s.StackOrder)
                 .ToList();
 

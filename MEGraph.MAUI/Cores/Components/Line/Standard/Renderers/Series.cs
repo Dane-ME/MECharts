@@ -41,6 +41,8 @@ namespace MEGraph.MAUI.Cores.Components.Line.Standard.Renderers
 
             foreach (var series in baseChart.Series)
             {
+                if (!series.IsVisible) continue;
+
                 if (series is LineSeries lineSeries)
                     lineSeries.Draw(canvas, plotArea, globalMinY, globalMaxY, baseChart.AnimationProgress, totalPoints);
                 else

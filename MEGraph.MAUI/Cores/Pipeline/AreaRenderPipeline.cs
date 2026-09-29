@@ -75,7 +75,7 @@ namespace MEGraph.MAUI.Cores.Pipeline
         {
             if (chart?.Series == null || !chart.Series.Any()) return;
 
-            var areaSeries = chart.Series.OfType<AreaSeries>().ToList();
+            var areaSeries = chart.Series.OfType<AreaSeries>().Where(s => s.IsVisible).ToList();
             if (!areaSeries.Any()) return;
 
             var allData = areaSeries.Where(s => s.Data != null).SelectMany(s => s.Data).ToList();

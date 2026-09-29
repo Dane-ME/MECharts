@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.8.12105.206 oobstable
+VisualStudioVersion = 18.8.12105.206
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MEGraph.MAUI", "MEGraph.MAUI\MEGraph.MAUI.csproj", "{12676A91-B06D-42FC-A919-90D090FBEEF7}"
 EndProject
@@ -10,7 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MEGraph.Test", "MEGraph.Test\MEGraph.Test.csproj", "{265CBBDB-26A1-4BB9-8072-8C655C97A29B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MEGraph.Test", "MEGraph.Test\MEGraph.Test.csproj", "{9FAB00F1-F287-4581-AC8A-BFB33FA02D77}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -22,10 +22,11 @@ Global
 		{12676A91-B06D-42FC-A919-90D090FBEEF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{12676A91-B06D-42FC-A919-90D090FBEEF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{12676A91-B06D-42FC-A919-90D090FBEEF7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{265CBBDB-26A1-4BB9-8072-8C655C97A29B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{265CBBDB-26A1-4BB9-8072-8C655C97A29B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{265CBBDB-26A1-4BB9-8072-8C655C97A29B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{265CBBDB-26A1-4BB9-8072-8C655C97A29B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9FAB00F1-F287-4581-AC8A-BFB33FA02D77}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9FAB00F1-F287-4581-AC8A-BFB33FA02D77}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9FAB00F1-F287-4581-AC8A-BFB33FA02D77}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{9FAB00F1-F287-4581-AC8A-BFB33FA02D77}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9FAB00F1-F287-4581-AC8A-BFB33FA02D77}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
