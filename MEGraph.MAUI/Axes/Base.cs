@@ -69,7 +69,14 @@ namespace MEGraph.MAUI.Axes
             DrawTitle(canvas, outerArea, plotArea);
 
             if (ShowGridLines)
+            {
+                // START - 2.6.1 - ADD - Clip plotArea to prevent gridlines from leaking outside bounds
+                canvas.SaveState();
+                canvas.ClipRectangle(plotArea);
                 DrawGridLines(canvas, plotArea);
+                canvas.RestoreState();
+                // END - 2.6.1 - ADD
+            }
         }
 
         public virtual void CalculateTicks()

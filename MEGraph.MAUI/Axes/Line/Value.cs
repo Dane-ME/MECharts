@@ -1,4 +1,4 @@
-﻿using MEGraph.MAUI.Styles;
+using MEGraph.MAUI.Styles;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -153,14 +153,16 @@ namespace MEGraph.MAUI.Axes.Line
 
         protected override void DrawGridLine(ICanvas canvas, float position, RectF plotArea)
         {
+            // START - 2.6.1 - EDIT - Fix inverted grid line orientation for Value axis
             if (Orientation == AxisOrientation.Y)
-            {
-                canvas.DrawLine(position, plotArea.Top, position, plotArea.Bottom);
-            }
-            else if (Orientation == AxisOrientation.X)
             {
                 canvas.DrawLine(plotArea.Left, position, plotArea.Right, position);
             }
+            else if (Orientation == AxisOrientation.X)
+            {
+                canvas.DrawLine(position, plotArea.Top, position, plotArea.Bottom);
+            }
+            // END - 2.6.1 - EDIT
         }
 
         // === VALUE SPECIFIC METHODS ===

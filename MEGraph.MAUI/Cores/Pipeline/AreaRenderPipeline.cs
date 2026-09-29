@@ -123,8 +123,13 @@ namespace MEGraph.MAUI.Cores.Pipeline
 
         public void DrawBackground(ICanvas canvas, RectF dirtyRect)
         {
-            canvas.FillColor = _chart.BackgroundColor ?? Colors.Transparent;
-            canvas.FillRectangle(dirtyRect);
+            // START - 2.6.1 - EDIT - Clear canvas and fill chart background
+            if (_chart.BackgroundColor != null && _chart.BackgroundColor != Colors.Transparent)
+            {
+                canvas.FillColor = _chart.BackgroundColor;
+                canvas.FillRectangle(dirtyRect);
+            }
+            // END - 2.6.1 - EDIT
         }
     }
 }
