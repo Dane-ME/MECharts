@@ -4,7 +4,8 @@ A powerful and flexible charting library for .NET MAUI applications, built with 
 
 Note: Currently, only Line, Stacked Line, Area, and Pie charts are functional. Other features will be added in future updates.
 
-👉 **[Xem Hướng Dẫn Sử Dụng Chi Tiết (TUTORIALS.md)](./TUTORIALS.md)**
+👉 **[Xem Hướng Dẫn Sử Dụng Chi Tiết (TUTORIALS.md)](./TUTORIALS.md)**  
+👉 **[Xem Phân Tích Kiến Trúc Hệ Thống (ARCHITECTURE.md)](./ARCHITECTURE.md)**
 
 ## Features
 

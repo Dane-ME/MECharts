@@ -1,33 +1,61 @@
-# Hướng Dẫn Sử Dụng MEGraph.MAUI / MEGraph.MAUI Tutorials
+# Cẩm Nang Lập Trình & Hướng Dẫn Sử Dụng MEGraph.MAUI (MECharts)
+> **Dành cho Lập trình viên và AI Coding Agents (System Prompt & Developer Cheatsheet)**  
+> **Phiên bản thư viện**: 2.6.2+  
+> **Nền tảng**: .NET MAUI (.NET 8.0 - .NET 10.0), C# 12  
+> **Động cơ đồ họa**: `Microsoft.Maui.Graphics` (Canvas thuần đa nền tảng, không phụ thuộc wrapper bên ngoài)
 
-Tài liệu này cung cấp hướng dẫn chi tiết và ví dụ thực tế về cách sử dụng các tính năng, API và cấu hình mới nhất trong thư viện **MEGraph.MAUI** (phiên bản 2.6.1+).  
-*This document provides comprehensive guides and practical examples for using the latest features, APIs, and configurations in the **MEGraph.MAUI** library (version 2.6.1+).*
+---
+
+## 📌 QUY TẮC BẮT BUỘC DÀNH CHO AI AGENT KHI VIẾT CODE MEGRAPH
+Khi tạo hoặc chỉnh sửa code liên quan đến MEGraph, Agent **PHẢI TUÂN THỦ** các nguyên tắc kiến trúc sau:
+1. **Namespace chuẩn mực**:
+   - Biểu đồ: `MEGraph.MAUI.Charts.Line`, `MEGraph.MAUI.Charts.Column`, `MEGraph.MAUI.Charts.Area`, `MEGraph.MAUI.Charts.Pie`
+   - Chuỗi dữ liệu: `MEGraph.MAUI.Series.Line`, `MEGraph.MAUI.Series.Column`, `MEGraph.MAUI.Series.Area`, `MEGraph.MAUI.Series.Pie`
+   - Trục tọa độ: `MEGraph.MAUI.Axes`, `MEGraph.MAUI.Axes.Line`, `MEGraph.MAUI.Styles`
+   - Bảng màu: `MEGraph.MAUI.Theme.ChartColors`
+2. **Cơ chế thêm Series vào Chart**:
+   - Luôn sử dụng hàm `chart.AddSeries(series)` hoặc bind qua `ObservableCollection` (`SeriesItems`).
+   - Nếu khởi tạo lại hoặc reset dữ liệu code-behind: luôn gọi `chart.SeriesList.Clear(); ((BaseChart)chart).Series.Clear();` trước khi add để tránh bị nhân bản series mặc định.
+3. **Cơ chế Trục (Axes) & Đa Trục Y (Dual Y-Axes)**:
+   - Trục X dùng `Category` với `Orientation = AxisOrientation.X`.
+   - Trục Y dùng `Value` với `Orientation = AxisOrientation.Y`.
+   - Khi có **2 trục Y khác đơn vị**:
+     - Trục trái: `AxisPosition = AxisPosition.Left`, gán `Id = "left-axis"`.
+     - Trục phải: `AxisPosition = AxisPosition.Right`, gán `Id = "right-axis"`. Đặt `ShowGridLines = false` để tránh đè vạch ngang.
+     - Series tương ứng: gán `series.AxisId = "left-axis"` hoặc `series.AxisId = "right-axis"`.
+4. **Tiêu đề (Chart Title)**:
+   - Thuộc tính `Title` trên `BaseChart` là tùy chọn. Nếu không muốn hiển thị tiêu đề trong chart, hãy đặt `Title = ""` (hoặc không set trong XAML).
+5. **Tính năng thẩm mỹ hiện đại (Modern Aesthetics)**:
+   - Dùng `IsSmooth = true` cho `LineSeries` để kích hoạt Fritsch-Carlson Spline.
+   - Dùng `UseGradient = true`, `GradientEndColor`, và `CornerRadius = 6f` cho `ColumnSeries`.
+   - Dùng `ChartColors` (Tableau 10) thay vì các màu cứng `Colors.Red`, `Colors.Blue`.
 
 ---
 
 ## Mục Lục / Table of Contents
-1. [Hệ Thống Bảng Màu Mặc Định / Default Color Palette (ChartColors)](#1-hệ-thống-bảng-màu-mặc-định--default-color-palette-chartcolors)
-2. [Cấu Hình và Đồng Bộ Trục Tọa Độ / Axes & Gridlines Configuration](#2-cấu-hình-và-đồng-bộ-trục-tọa-độ--axes--gridlines-configuration)
-   - [Trục X (Category Axis) và Auto-Skip Ticks / Category Axis & Auto-Skip Ticks](#trục-x-category-axis-và-auto-skip-ticks--category-axis--auto-skip-ticks)
-   - [Trục Y (Value Axis) và AutoRange / Value Axis & AutoRange](#trục-y-value-axis-và-autorange--value-axis--autorange)
-3. [Đường Cong Mềm Mại / Smooth Spline Curves](#3-đường-cong-mềm-mại--smooth-spline-curves)
-4. [Tô Màu Gradient Diện Tích / Gradient Area Fill](#4-tô-màu-gradient-diện-tích--gradient-area-fill)
-5. [Ẩn / Hiện Series Động / Toggle Series Visibility](#5-ẩn--hiện-series-động--toggle-series-visibility)
-6. [Hiệu Ứng Hoạt Họa Vẽ Vào / Draw-In Entry Animation](#6-hiệu-ứng-hoạt-họa-vẽ-vào--draw-in-entry-animation)
-7. [Ví Dụ Tổng Hợp Đầy Đủ / Full Working Example](#7-ví-dụ-tổng-hợp-đầy-đủ--full-working-example)
+1. [Hệ Thống Bảng Màu Tiêu Chuẩn (ChartColors)](#1-hệ-thống-bảng-màu-tiêu-chuẩn-chartcolors)
+2. [Cấu Hình Trục Tọa Độ & Đa Trục Y (Dual Y-Axes)](#2-cấu-hình-trục-tọa-độ--đa-trục-y-dual-y-axes)
+   - [Trục X (Category Axis) & AutoSkip](#21-trục-x-category-axis--autoskip)
+   - [Trục Y Đơn (Single Value Axis) & AutoRange](#22-trục-y-đơn-single-value-axis--autorange)
+   - [Trục Y Kép (Dual Y-Axes) cho 2 đơn vị khác nhau](#23-trục-y-kép-dual-y-axes-cho-2-đơn-vị-khác-nhau)
+3. [Biểu Đồ Cột Dọc (ColumnChart) & Cột Nhóm (Clustered Bars)](#3-biểu-đồ-cột-dọc-columnchart--cột-nhóm-clustered-bars)
+4. [Biểu Đồ Đường (LineChart) & Đường Cong Spline Mềm Mại](#4-biểu-đồ-đường-linechart--đường-cong-spline-mềm-mại)
+5. [Biểu Đồ Miền Diện Tích (AreaChart) & Gradient Fill](#5-biểu-đồ-miền-diện-tích-areachart--gradient-fill)
+6. [Tương Tác Ẩn / Hiện Series (Toggle Series Visibility)](#6-tương-tác-ẩn--hiện-series-toggle-series-visibility)
+7. [Tiêu Đề Biểu Đồ (Title: Có hoặc Không có)](#7-tiêu-đề-biểu-đồ-title-có-hoặc-không-có)
+8. [Hiệu Ứng Hoạt Họa (Draw-in Entry Animation)](#8-hiệu-ứng-hoạt-họa-draw-in-entry-animation)
+9. [Cú Pháp XAML & MVVM Binding Hoàn Chỉnh](#9-cú-pháp-xaml--mvvm-binding-hoàn-chỉnh)
 
 ---
 
-## 1. Hệ Thống Bảng Màu Mặc Định / Default Color Palette (ChartColors)
+## 1. Hệ Thống Bảng Màu Tiêu Chuẩn (ChartColors)
 
-Từ phiên bản 2.6.0+, MEGraph tích hợp sẵn bảng màu tiêu chuẩn **Tableau 10** qua lớp static `MEGraph.MAUI.Theme.ChartColors`.  
-*From version 2.6.0+, MEGraph includes the standard **Tableau 10** color palette via the static class `MEGraph.MAUI.Theme.ChartColors`.*
+Lớp tĩnh `MEGraph.MAUI.Theme.ChartColors` cung cấp bảng màu **Tableau 10** chuẩn quốc tế:
 
-### Các màu có sẵn / Available Colors:
 ```csharp
 using MEGraph.MAUI.Theme;
 
-Color blue   = ChartColors.Blue;    // #4e79a7 (Default primary color / Màu chính mặc định)
+Color blue   = ChartColors.Blue;    // #4e79a7 (Màu chính mặc định)
 Color orange = ChartColors.Orange;  // #f28e2c
 Color red    = ChartColors.Red;     // #e15759
 Color teal   = ChartColors.Teal;    // #76b7b2
@@ -39,294 +67,371 @@ Color brown  = ChartColors.Brown;   // #9c755f
 Color gray   = ChartColors.Gray;    // #bab0ab
 ```
 
-### Các hàm hỗ trợ / Helper Methods:
-- **`ChartColors.GetColor(int index)`**:
-  - **VI**: Lấy màu tuần hoàn theo chỉ số vòng lặp. Rất tiện khi tạo nhiều Series tự động.
-  - **EN**: Retrieves colors cyclically by index. Useful when generating multiple Series dynamically.
-  ```csharp
-  for (int i = 0; i < mySeriesList.Count; i++)
-  {
-      mySeriesList[i].StrokeColor = ChartColors.GetColor(i);
-  }
-  ```
-- **`ChartColors.Palette`**:
-  - **VI**: Danh sách `IReadOnlyList<Color>` chứa toàn bộ 10 màu.
-  - **EN**: An `IReadOnlyList<Color>` containing all 10 palette colors.
-- **`ChartColors.GetDistinctColors(ICollection<Color> existing, int count)`**:
-  - **VI**: Sinh danh sách các màu không trùng lặp (thường dùng cho Pie/Donut Chart slices).
-  - **EN**: Generates non-repeating distinct colors (commonly used for Pie/Donut slices).
+### Hàm tiện ích:
+```csharp
+// Lấy màu tuần hoàn theo index (rất tiện khi duyệt danh sách series)
+Color color = ChartColors.GetColor(i);
+
+// Lấy danh sách màu không trùng lặp (dùng cho PieChart slices)
+var distinctColors = ChartColors.GetDistinctColors(existingColors, count: 5);
+```
 
 ---
 
-## 2. Cấu Hình và Đồng Bộ Trục Tọa Độ / Axes & Gridlines Configuration
+## 2. Cấu Hình Trục Tọa Độ & Đa Trục Y (Dual Y-Axes)
 
-MEGraph v2.6.1 cải tiến toàn diện cơ chế vẽ lưới:
-- **Trục Y (Value)**: Vẽ các đường dóng **ngang** chuẩn xác.
-- **Trục X (Category)**: Vẽ các đường dóng **dọc** đồng bộ 100% với nhãn hiển thị.
-- **Auto-Clipping**: Toàn bộ đường lưới được bao bọc trong `canvas.ClipRectangle(plotArea)`, đảm bảo không bao giờ bị lem ra ngoài lề hay đè lên tiêu đề.
-
-*MEGraph v2.6.1 comprehensively upgrades gridline rendering:*
-- *__Y-Axis (Value)__: Accurately draws __horizontal__ gridlines.*
-- *__X-Axis (Category)__: Accurately draws __vertical__ gridlines that stay 100% synchronized with visible labels.*
-- *__Auto-Clipping__: Gridlines are bounded inside `canvas.ClipRectangle(plotArea)` to prevent them from leaking into margins or headers.*
-
----
-
-### Trục X (Category Axis) và Auto-Skip Ticks / Category Axis & Auto-Skip Ticks
-
+### 2.1. Trục X (Category Axis) & AutoSkip
+Dùng để hiển thị nhãn danh mục (thời gian, tháng, danh mục sản phẩm):
 ```csharp
 using MEGraph.MAUI.Axes;
 using MEGraph.MAUI.Axes.Line;
+using MEGraph.MAUI.Styles;
 
-var categoryAxis = new Category
+var xAxis = new Category
 {
     Orientation = AxisOrientation.X,
-    ShowGridLines = true,                          // VI: Bật/tắt đường dóng dọc | EN: Toggle vertical gridlines
-    GridColor = Color.FromArgb("#E5E7EB"),         // VI: Màu đường lưới mờ      | EN: Faded grid color
-    GridLineWidth = 1f,                            // VI: Độ dày đường lưới      | EN: Grid line thickness
-    AutoSkip = true,                               // VI: Tự động thưa nhãn      | EN: Auto-skip dense labels
+    ShowGridLines = true,                          // Bật đường dóng dọc
+    GridColor = Color.FromArgb("#F1F5F9"),         // Màu lưới mờ
+    GridLineWidth = 1f,
+    AutoSkip = true,                               // Tự động thưa nhãn khi màn hình hẹp
     Labels = new List<AxisLabel>
     {
-        new AxisLabel("00:00"),
-        new AxisLabel("04:00"),
-        new AxisLabel("08:00"),
-        new AxisLabel("12:00"),
-        new AxisLabel("16:00"),
-        new AxisLabel("20:00"),
-        new AxisLabel("24:00")
-    }
-};
-```
-
-> **Cơ chế tự động đồng bộ (v2.6.1) / Auto-Sync Mechanism (v2.6.1):**  
-> - **VI**: Khi `AutoSkip = true`, nếu màn hình nhỏ hoặc có nhiều nhãn, các nhãn sẽ tự động nhảy bước (`stride`). Các đường dọc (Gridlines) sẽ tự động ẩn các vạch tương ứng, không còn tình trạng hàng chục đường dọc ken đặc gây mờ màn hình.  
-> - **EN**: When `AutoSkip = true`, labels automatically step (`stride`) if space is tight. Vertical gridlines automatically match this stride, preventing dense clutter across the plot area.
-
----
-
-### Trục Y (Value Axis) và AutoRange / Value Axis & AutoRange
-
-```csharp
-using MEGraph.MAUI.Axes.Line;
-
-// Cách 1 / Approach 1: Tự động tính khoảng giá trị theo Data (Khuyên dùng)
-// Auto-scale value range based on data (Recommended)
-var autoValueAxis = new Value
-{
-    Orientation = AxisOrientation.Y,
-    IsAutoRange = true,                            // VI: Tự động tính Min/Max  | EN: Auto-calculate Min/Max
-    ShowGridLines = true,                          // VI: Bật đường dóng ngang   | EN: Enable horizontal gridlines
-    GridColor = Color.FromArgb("#E5E7EB"),
-    GridLineWidth = 1f
-};
-
-// Cách 2 / Approach 2: Cố định khoảng giá trị thủ công
-// Fixed custom range
-var fixedValueAxis = new Value
-{
-    Orientation = AxisOrientation.Y,
-    IsAutoRange = false,                           // VI: Tắt tự động tính       | EN: Disable auto-range
-    MinValue = -2f,
-    MaxValue = 10f,
-    TickCount = 5                                  // VI: Số vạch chia trục tung | EN: Number of Y ticks
+        new AxisLabel("Tháng 1"),
+        new AxisLabel("Tháng 2"),
+        new AxisLabel("Tháng 3"),
+        new AxisLabel("Tháng 4"),
+        new AxisLabel("Tháng 5"),
+        new AxisLabel("Tháng 6")
+    },
+    TotalPoints = 6                                // Khớp với số lượng điểm dữ liệu
 };
 ```
 
 ---
 
-## 3. Đường Cong Mềm Mại / Smooth Spline Curves
+### 2.2. Trục Y Đơn (Single Value Axis) & AutoRange
+```csharp
+// Cách 1: Tự động tính Min/Max theo dữ liệu (Khuyên dùng)
+var autoYAxis = new Value
+{
+    Orientation = AxisOrientation.Y,
+    AxisPosition = AxisPosition.Left,
+    IsAutoRange = true,
+    ShowGridLines = true,
+    GridColor = Color.FromArgb("#F1F5F9")
+};
 
-- **VI**: Loại bỏ các góc nhọn trên đường vẽ, tự động bo cong mềm mại với giải thuật Fritsch-Carlson bảo toàn độ dốc (không bị lọt/lẹm trục).
-- **EN**: Eliminates sharp corners and renders organic, smooth curves using the Fritsch-Carlson Monotone Cubic Spline algorithm without overshoot.
+// Cách 2: Cố định khoảng giá trị tùy chỉnh
+var fixedYAxis = new Value
+{
+    Orientation = AxisOrientation.Y,
+    AxisPosition = AxisPosition.Left,
+    IsAutoRange = false,
+    MinValue = 0f,
+    MaxValue = 100f,
+    TickCount = 5,
+    ShowGridLines = true
+};
+```
+
+---
+
+### 2.3. Trục Y Kép (Dual Y-Axes) cho 2 đơn vị khác nhau
+Dùng khi biểu đồ cần mô tả 2 đại lượng khác nhau (ví dụ: Cột sản lượng `kWh` ở trục trái và Cột/Đường doanh thu `Triệu VNĐ` ở trục phải):
 
 ```csharp
+// 1. Trục Y Trái: Đại lượng 1 (kWh)
+var leftYAxis = new Value
+{
+    Id = "axis-kwh",
+    Orientation = AxisOrientation.Y,
+    AxisPosition = AxisPosition.Left,
+    Title = new AxisTitle("kWh"),
+    MinValue = 0f,
+    MaxValue = 500f,
+    TickCount = 6,
+    ShowGridLines = true,
+    GridColor = Color.FromArgb("#F1F5F9")
+};
+
+// 2. Trục Y Phải: Đại lượng 2 (Triệu VNĐ)
+var rightYAxis = new Value
+{
+    Id = "axis-vnd",
+    Orientation = AxisOrientation.Y,
+    AxisPosition = AxisPosition.Right,
+    Title = new AxisTitle("Tr.đ"),
+    MinValue = 0f,
+    MaxValue = 50f,
+    TickCount = 6,
+    ShowGridLines = false  // QUAN TRỌNG: Tắt gridline trục phải để tránh đè vạch
+};
+
+// Gán trục vào Chart
+myChart.Axes = new ObservableCollection<IAxis> { xAxis, leftYAxis, rightYAxis };
+```
+
+---
+
+## 3. Biểu Đồ Cột Dọc (ColumnChart) & Cột Nhóm (Clustered Bars)
+
+`ColumnChart` hỗ trợ vẽ nhiều cột nhóm (clustered group) trong cùng một category, bo góc tròn và tô màu gradient hiện đại.
+
+```csharp
+using MEGraph.MAUI.Charts.Column;
+using MEGraph.MAUI.Series.Column;
+
+// 1. Khởi tạo Series 1 (gắn vào Trục Trái qua AxisId)
+var colSeries1 = new ColumnSeries
+{
+    Name = "Sản lượng",
+    AxisId = "axis-kwh",
+    FillColor = Color.FromArgb("#2563EB"),
+    GradientEndColor = Color.FromArgb("#60A5FA"),
+    UseGradient = true,               // Bật chuyển sắc mờ hiện đại
+    CornerRadius = 6f,                // Bo tròn đỉnh cột
+    Data = new List<float> { 280f, 350f, 420f, 390f, 480f, 440f }
+};
+
+// 2. Khởi tạo Series 2 (gắn vào Trục Phải qua AxisId)
+var colSeries2 = new ColumnSeries
+{
+    Name = "Doanh thu",
+    AxisId = "axis-vnd",
+    FillColor = Color.FromArgb("#F59E0B"),
+    GradientEndColor = Color.FromArgb("#FDE68A"),
+    UseGradient = true,
+    CornerRadius = 6f,
+    Data = new List<float> { 18f, 24f, 35f, 31f, 45f, 39f }
+};
+
+// Thêm vào ColumnChart
+columnChart.AddSeries(colSeries1);
+columnChart.AddSeries(colSeries2);
+```
+
+---
+
+## 4. Biểu Đồ Đường (LineChart) & Đường Cong Spline Mềm Mại
+
+Dùng `IsSmooth = true` để áp dụng thuật toán Fritsch-Carlson Monotone Spline (không gây overshoot vượt quá trục):
+
+```csharp
+using MEGraph.MAUI.Charts.Line;
 using MEGraph.MAUI.Series.Line;
-using MEGraph.MAUI.Theme;
 
-var smoothSeries = new LineSeries
+var lineSeries = new LineSeries
 {
-    Name = "Temperature",
-    StrokeColor = ChartColors.Orange,
+    Name = "Nhiệt độ",
+    StrokeColor = Color.FromArgb("#10B981"),
     StrokeWidth = 3f,
-    
-    // VI: Bật đường cong Monotone Cubic Spline | EN: Enable Monotone Cubic Spline curve
-    IsSmooth = true,
-    
-    // VI: Độ căng đường cong (0.0f - 0.5f, mặc định 0.25f) | EN: Curve tension (0.0f - 0.5f, default 0.25f)
-    SmoothTension = 0.25f,
-    
-    Data = new List<float> { 22f, 24f, 28f, 33f, 31f, 27f, 23f }
+    IsSmooth = true,                  // Bật đường cong mềm mại
+    SmoothTension = 0.25f,            // Độ căng đường cong (0.0f - 0.5f, mặc định 0.25f)
+    Data = new List<float> { 22f, 24f, 28f, 33f, 31f, 27f }
 };
+
+lineChart.AddSeries(lineSeries);
 ```
 
 ---
 
-## 4. Tô Màu Gradient Diện Tích / Gradient Area Fill
-
-- **VI**: Sử dụng trong `AreaChart` hoặc `AreaSeries` để tạo hiệu ứng diện tích mờ dần từ đường đỉnh xuống đáy.
-- **EN**: Used in `AreaChart` or `AreaSeries` to create beautiful downward fading fill gradients.
+## 5. Biểu Đồ Miền Diện Tích (AreaChart) & Gradient Fill
 
 ```csharp
+using MEGraph.MAUI.Charts.Area;
 using MEGraph.MAUI.Series.Area;
-using MEGraph.MAUI.Theme;
 
 var areaSeries = new AreaSeries
 {
-    Name = "Power Output",
-    StrokeColor = ChartColors.Teal,
+    Name = "Công suất",
+    StrokeColor = Color.FromArgb("#06B6D4"),
     StrokeWidth = 3f,
     IsSmooth = true,
-    
-    // VI: Bật gradient chuyển sắc mờ dần | EN: Enable vertical fade gradient fill
-    UseGradientFill = true,
-    
-    Data = new List<float> { 0f, 1.2f, 3.5f, 4.8f, 2.1f, 0.4f }
+    UseGradientFill = true,           // Mờ dần diện tích từ đỉnh xuống trục hoành
+    Data = new List<float> { 1.2f, 2.5f, 4.8f, 3.1f, 1.5f, 0.5f }
 };
+
+areaChart.AddSeries(areaSeries);
 ```
 
 ---
 
-## 5. Ẩn / Hiện Series Động / Toggle Series Visibility
+## 6. Tương Tác Ẩn / Hiện Series (Toggle Series Visibility)
 
-- **VI**: Khi người dùng nhấn vào Legend hoặc nút bấm tùy chỉnh để bật/tắt hiển thị từng đường series.
-- **EN**: Allows users to interactively show or hide individual series when clicking on legends or buttons.
+Hỗ trợ click nút/legend bên ngoài XAML để ẩn hoặc hiện từng Series:
 
-### Các hàm hỗ trợ trong `BaseChart` / Built-in Methods in `BaseChart`:
 ```csharp
-// 1. Đảo trạng thái hiển thị (Bật -> Tắt, Tắt -> Bật) / Toggle visibility
-myChart.ToggleSeries("SeriesName");
+// Bật/tắt trạng thái hiển thị của Series theo tên
+myChart.ToggleSeries("Sản lượng");
 
-// 2. Thiết lập trạng thái hiển thị cụ thể / Set explicit visibility state
-myChart.SetSeriesVisibility("SeriesName", isVisible: false);
+// Hoặc đặt rõ trạng thái true/false
+myChart.SetSeriesVisibility("Sản lượng", isVisible: false);
 ```
 
-### Ví dụ xử lý sự kiện trong XAML & C# / Code Example:
-
-**XAML:**
-```xml
-<Border x:Name="BtnTogglePv" BackgroundColor="White" Padding="12,8">
-    <Border.GestureRecognizers>
-        <TapGestureRecognizer Tapped="OnTogglePvClicked" />
-    </Border.GestureRecognizers>
-    <Label Text="Solar PV" />
-</Border>
-
-<charts:LineChart x:Name="MyChart" HeightRequest="300" />
-```
-
-**C# Code-Behind:**
+**Ví dụ Code-Behind kết hợp cập nhật Opacity giao diện nút:**
 ```csharp
-private void OnTogglePvClicked(object sender, EventArgs e)
+private void OnToggleSeriesClicked(object sender, EventArgs e)
 {
-    // VI: Bật/tắt Series "PV" | EN: Toggle series "PV"
-    MyChart.ToggleSeries("PV");
+    myChart.ToggleSeries("Sản lượng");
     
-    // VI: Cập nhật độ mờ nút bấm theo trạng thái | EN: Update button opacity accordingly
-    var pvSeries = MyChart.Series.FirstOrDefault(s => s.Name == "PV");
-    BtnTogglePv.Opacity = (pvSeries?.IsVisible == true) ? 1.0 : 0.4;
+    var s = myChart.Series.FirstOrDefault(x => x.Name == "Sản lượng");
+    BtnToggle.Opacity = (s?.IsVisible == true) ? 1.0 : 0.35;
 }
 ```
 
-> **Lợi ích trong phiên bản 2.6.1 / Improvements in v2.6.1:**
-> - **VI**: Khi ẩn/hiện Series, Canvas được dọn dẹp sạch sẽ (không bị bóng ma/chồng hình cũ), và các đường dóng ngang/dọc tự động đồng bộ theo khoảng dữ liệu mới.
-> - **EN**: Toggling series cleanly repaints without ghosting artifacts, and gridlines seamlessly re-adapt to the new data bounds.
-
 ---
 
-## 6. Hiệu Ứng Hoạt Họa Vẽ Vào / Draw-In Entry Animation
+## 7. Tiêu Đề Biểu Đồ (Title: Có hoặc Không có)
 
-- **VI**: Biểu đồ tự động thực hiện hiệu ứng vẽ dần từ trái sang phải mượt mà khi vừa hiển thị hoặc khi thay đổi dữ liệu.
-- **EN**: Charts smoothly draw series paths from left to right upon initial load or data transitions.
+Biểu đồ MEGraph hỗ trợ linh hoạt cả 2 trường hợp:
 
-### Cấu hình qua XAML hoặc Code / Configuration:
+### Trường hợp 1: Không dùng Title (Ẩn hoàn toàn)
+Khi không truyền hoặc truyền chuỗi rỗng `""`, renderer sẽ bỏ qua việc vẽ tiêu đề, giúp đồ thị có không gian hiển thị tối đa:
 ```xml
-<charts:LineChart x:Name="MyChart"
-                  AnimationDuration="1500" /> <!-- 1500ms = 1.5s -->
+<!-- XAML: Bỏ trống Title -->
+<colCharts:ColumnChart x:Name="ColChart" Title="" HeightRequest="300" />
+```
+```csharp
+// C#: Đặt rỗng hoặc null
+myChart.Title = "";
 ```
 
-### Kích hoạt lại hiệu ứng / Triggering Programmatically:
+### Trường hợp 2: Có Title tích hợp
+```xml
+<colCharts:ColumnChart x:Name="ColChart" Title="Báo Cáo Sản Lượng 2026" HeightRequest="300" />
+```
 ```csharp
-// VI: Chạy lại hiệu ứng với thời gian mặc định | EN: Replay with default duration
-MyChart.PlayEntryAnimation();
-
-// VI: Hoặc chỉ định thời gian mới (ms)          | EN: Or specify duration in milliseconds
-MyChart.PlayEntryAnimation(duration: 2000);
+myChart.Title = "Báo Cáo Sản Lượng 2026";
 ```
 
 ---
 
-## 7. Ví Dụ Tổng Hợp Đầy Đủ / Full Working Example
+## 8. Hiệu Ứng Hoạt Họa (Draw-in Entry Animation)
 
-Dưới đây là ví dụ hoàn chỉnh khởi tạo một biểu đồ đường đa chuỗi với đầy đủ các tính năng:  
-*A complete working example configuring a multi-series line chart with all modern features:*
+Biểu đồ tự động chạy hiệu ứng vẽ vào (draw-in) khi tải trang. Có thể kích hoạt lại bất kỳ lúc nào:
 
+```xml
+<colCharts:ColumnChart x:Name="ColChart"
+                       AnimationDuration="1500" /> <!-- Thời lượng ms -->
+```
+
+```csharp
+// Chạy lại hiệu ứng
+myChart.PlayEntryAnimation();
+
+// Hoặc truyền thời gian tùy chỉnh (ms)
+myChart.PlayEntryAnimation(duration: 2000);
+```
+
+---
+
+## 9. Cú Pháp XAML & MVVM Binding Hoàn Chỉnh
+
+### 9.1. Khai báo Namespace XAML chuẩn
+```xml
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:lineCharts="clr-namespace:MEGraph.MAUI.Charts.Line;assembly=MEGraph.MAUI"
+             xmlns:colCharts="clr-namespace:MEGraph.MAUI.Charts.Column;assembly=MEGraph.MAUI"
+             xmlns:areaCharts="clr-namespace:MEGraph.MAUI.Charts.Area;assembly=MEGraph.MAUI"
+             xmlns:pieCharts="clr-namespace:MEGraph.MAUI.Charts.Pie;assembly=MEGraph.MAUI"
+             x:Class="MyApp.MainPage">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="20">
+
+            <!-- Biểu đồ cột trục kép -->
+            <colCharts:ColumnChart x:Name="MyColumnChart"
+                                   HeightRequest="300"
+                                   AnimationDuration="1200"
+                                   BackgroundColor="Transparent" />
+
+            <!-- Biểu đồ đường cong -->
+            <lineCharts:LineChart x:Name="MyLineChart"
+                                  HeightRequest="280"
+                                  AnimationDuration="1200"
+                                  BackgroundColor="Transparent" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
+```
+
+### 9.2. Code-behind / ViewModel thiết lập chuẩn mẫu (Boilerplate)
 ```csharp
 using MEGraph.MAUI.Axes;
 using MEGraph.MAUI.Axes.Line;
-using MEGraph.MAUI.Series.Line;
-using MEGraph.MAUI.Theme;
+using MEGraph.MAUI.Charts.Column;
+using MEGraph.MAUI.Series.Column;
+using MEGraph.MAUI.Styles;
 using System.Collections.ObjectModel;
 
-private void SetupMyChart()
+public void InitializeDashboard()
 {
-    // 1. Dọn dẹp dữ liệu cũ (nếu có) / Clear previous series if any
-    MyChart.SeriesList.Clear();
-    ((MEGraph.MAUI.Cores.BaseChart)MyChart).Series.Clear();
+    // 1. Reset các series cũ nếu có
+    MyColumnChart.SeriesList.Clear();
+    ((MEGraph.MAUI.Cores.BaseChart)MyColumnChart).Series.Clear();
 
-    // 2. Tạo Series 1 (PV) / Create Series 1 (Solar PV)
-    var pvSeries = new LineSeries
+    // 2. Tạo 2 series cho 2 đơn vị khác biệt
+    var col1 = new ColumnSeries
     {
-        Name = "PV",
-        StrokeColor = ChartColors.Orange,
-        StrokeWidth = 3f,
-        IsSmooth = true,
-        Data = new List<float> { 0f, 0f, 0.8f, 2.2f, 4.2f, 2.5f, 0f }
+        Name = "Điện năng (kWh)",
+        AxisId = "axis-left",
+        FillColor = Color.FromArgb("#2563EB"),
+        GradientEndColor = Color.FromArgb("#60A5FA"),
+        UseGradient = true,
+        CornerRadius = 6f,
+        Data = new List<float> { 120, 250, 310, 420, 380, 490 }
     };
 
-    // 3. Tạo Series 2 (Lưới điện) / Create Series 2 (Grid Power)
-    var gridSeries = new LineSeries
+    var col2 = new ColumnSeries
     {
-        Name = "Grid",
-        StrokeColor = ChartColors.Blue,
-        StrokeWidth = 3f,
-        IsSmooth = true,
-        Data = new List<float> { 1.5f, 1.2f, 0.2f, 0f, 0.5f, 1.8f, 2.0f }
+        Name = "Chi phí (Tr.đ)",
+        AxisId = "axis-right",
+        FillColor = Color.FromArgb("#F59E0B"),
+        GradientEndColor = Color.FromArgb("#FDE68A"),
+        UseGradient = true,
+        CornerRadius = 6f,
+        Data = new List<float> { 12, 25, 30, 45, 39, 52 }
     };
 
-    MyChart.AddSeries(pvSeries);
-    MyChart.AddSeries(gridSeries);
+    MyColumnChart.AddSeries(col1);
+    MyColumnChart.AddSeries(col2);
 
-    // 4. Thiết lập Trục X (Category Axis) / Configure X-Axis (Category)
+    // 3. Tạo trục hoành X
     var xAxis = new Category
     {
         Orientation = AxisOrientation.X,
-        AutoSkip = true,
-        ShowGridLines = true,
-        GridColor = Color.FromArgb("#F3F4F6"),
         Labels = new List<AxisLabel>
         {
-            new AxisLabel("00:00"),
-            new AxisLabel("04:00"),
-            new AxisLabel("08:00"),
-            new AxisLabel("12:00"),
-            new AxisLabel("16:00"),
-            new AxisLabel("20:00"),
-            new AxisLabel("24:00")
-        }
+            new AxisLabel("T1"), new AxisLabel("T2"), new AxisLabel("T3"),
+            new AxisLabel("T4"), new AxisLabel("T5"), new AxisLabel("T6")
+        },
+        TotalPoints = 6
     };
 
-    // 5. Thiết lập Trục Y (Value Axis) / Configure Y-Axis (Value)
-    var yAxis = new Value
+    // 4. Tạo 2 trục tung Y
+    var yLeft = new Value
     {
+        Id = "axis-left",
         Orientation = AxisOrientation.Y,
-        IsAutoRange = true, // VI: Tự động co dãn theo Data | EN: Auto-scale with data
-        ShowGridLines = true,
-        GridColor = Color.FromArgb("#F3F4F6")
+        AxisPosition = AxisPosition.Left,
+        Title = new AxisTitle("kWh"),
+        MinValue = 0, MaxValue = 600, TickCount = 6,
+        ShowGridLines = true
     };
 
-    MyChart.Axes = new ObservableCollection<IAxis> { xAxis, yAxis };
+    var yRight = new Value
+    {
+        Id = "axis-right",
+        Orientation = AxisOrientation.Y,
+        AxisPosition = AxisPosition.Right,
+        Title = new AxisTitle("Tr.đ"),
+        MinValue = 0, MaxValue = 60, TickCount = 6,
+        ShowGridLines = false
+    };
 
-    // 6. Kích hoạt hiệu ứng vẽ / Play draw-in animation
-    MyChart.PlayEntryAnimation(1500);
+    MyColumnChart.Axes = new ObservableCollection<IAxis> { xAxis, yLeft, yRight };
+    MyColumnChart.PlayEntryAnimation(1500);
 }
 ```

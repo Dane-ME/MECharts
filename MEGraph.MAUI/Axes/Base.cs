@@ -38,6 +38,7 @@ namespace MEGraph.MAUI.Axes
 
         // === THUỘC TÍNH VỊ TRÍ ===
         public float Position { get; set; } = 0f;
+        public AxisPosition AxisPosition { get; set; } = AxisPosition.Left;
         public bool IsReversed { get; set; } = false;
         // START - 2.1.4 - ADD - Fix the issue where axes were lost when rendering multiple charts.
         public string Id { get; set; }

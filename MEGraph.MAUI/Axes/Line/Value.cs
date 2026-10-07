@@ -29,7 +29,14 @@ namespace MEGraph.MAUI.Axes.Line
 
             if (Orientation == AxisOrientation.Y)
             {
-                canvas.DrawLine(plotArea.Left, plotArea.Top, plotArea.Left, plotArea.Bottom);
+                if (AxisPosition == AxisPosition.Right)
+                {
+                    canvas.DrawLine(plotArea.Right, plotArea.Top, plotArea.Right, plotArea.Bottom);
+                }
+                else
+                {
+                    canvas.DrawLine(plotArea.Left, plotArea.Top, plotArea.Left, plotArea.Bottom);
+                }
             }
             else if (Orientation == AxisOrientation.X)
             {
@@ -53,18 +60,42 @@ namespace MEGraph.MAUI.Axes.Line
 
                 if (Orientation == AxisOrientation.Y)
                 {
-                    // Draw Y-axis labels
-                    if (Math.Abs(label.Rotation) > 0.01f)
+                    if (AxisPosition == AxisPosition.Right)
                     {
-                        canvas.SaveState();
-                        canvas.Translate(plotArea.Left - label.Margin, position);
-                        canvas.Rotate(label.Rotation);
-                        canvas.DrawString(label.Content, 0, 0, label.HorizontalAlignment);
-                        canvas.RestoreState();
+                        // Draw Right Y-axis labels
+                        float labelX = plotArea.Right + label.Margin;
+                        var alignment = (label.HorizontalAlignment == HorizontalAlignment.Right) 
+                            ? HorizontalAlignment.Left 
+                            : label.HorizontalAlignment;
+
+                        if (Math.Abs(label.Rotation) > 0.01f)
+                        {
+                            canvas.SaveState();
+                            canvas.Translate(labelX, position);
+                            canvas.Rotate(label.Rotation);
+                            canvas.DrawString(label.Content, 0, 0, alignment);
+                            canvas.RestoreState();
+                        }
+                        else
+                        {
+                            canvas.DrawString(label.Content, labelX, position, alignment);
+                        }
                     }
                     else
                     {
-                        canvas.DrawString(label.Content, plotArea.Left - label.Margin, position, label.HorizontalAlignment);
+                        // Draw Left Y-axis labels
+                        if (Math.Abs(label.Rotation) > 0.01f)
+                        {
+                            canvas.SaveState();
+                            canvas.Translate(plotArea.Left - label.Margin, position);
+                            canvas.Rotate(label.Rotation);
+                            canvas.DrawString(label.Content, 0, 0, label.HorizontalAlignment);
+                            canvas.RestoreState();
+                        }
+                        else
+                        {
+                            canvas.DrawString(label.Content, plotArea.Left - label.Margin, position, label.HorizontalAlignment);
+                        }
                     }
                 }
                 else if (Orientation == AxisOrientation.X)
@@ -96,19 +127,38 @@ namespace MEGraph.MAUI.Axes.Line
 
             if (Orientation == AxisOrientation.Y)
             {
-                // Y-axis title (rotated)
-                var titleArea = new RectF(
-                    outerArea.Left,
-                    plotArea.Top,
-                    plotArea.Left - outerArea.Left,
-                    plotArea.Height
-                );
+                if (AxisPosition == AxisPosition.Right)
+                {
+                    // Right Y-axis title (rotated)
+                    var titleArea = new RectF(
+                        plotArea.Right,
+                        plotArea.Top,
+                        Math.Max(0, outerArea.Right - plotArea.Right),
+                        plotArea.Height
+                    );
 
-                canvas.SaveState();
-                canvas.Translate(titleArea.Center.X, titleArea.Center.Y);
-                canvas.Rotate(-90);
-                canvas.DrawString(Title.Content, 0, 0, Title.HorizontalAlignment);
-                canvas.RestoreState();
+                    canvas.SaveState();
+                    canvas.Translate(titleArea.Center.X, titleArea.Center.Y);
+                    canvas.Rotate(90);
+                    canvas.DrawString(Title.Content, 0, 0, Title.HorizontalAlignment);
+                    canvas.RestoreState();
+                }
+                else
+                {
+                    // Left Y-axis title (rotated)
+                    var titleArea = new RectF(
+                        outerArea.Left,
+                        plotArea.Top,
+                        plotArea.Left - outerArea.Left,
+                        plotArea.Height
+                    );
+
+                    canvas.SaveState();
+                    canvas.Translate(titleArea.Center.X, titleArea.Center.Y);
+                    canvas.Rotate(-90);
+                    canvas.DrawString(Title.Content, 0, 0, Title.HorizontalAlignment);
+                    canvas.RestoreState();
+                }
             }
             else if (Orientation == AxisOrientation.X)
             {

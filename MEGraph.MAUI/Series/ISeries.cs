@@ -13,6 +13,8 @@ namespace MEGraph.MAUI.Series
         Color Color { get; }
         /// <summary>Cờ xác định series có được vẽ hay không (mặc định là true).</summary>
         bool IsVisible { get; set; }
+        /// <summary>Id của trục Y gán với series (hỗ trợ Dual Y-axis hoặc Multi-axis). Mặc định null (dùng trục chính).</summary>
+        string? AxisId { get; set; }
         void Draw(ICanvas canvas, RectF plotArea);
     }
 }

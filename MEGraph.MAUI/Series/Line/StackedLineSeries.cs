@@ -9,6 +9,7 @@ namespace MEGraph.MAUI.Series.Line
     {
         public string Name { get; set; } = "StackedLineSeries";
         public bool IsVisible { get; set; } = true;
+        public string? AxisId { get; set; }
         public List<float> Data { get; set; } = new();
         public Color StrokeColor { get; set; } = Theme.ChartColors.DefaultPrimaryColor;
         public Color FillColor { get; set; } = Theme.ChartColors.DefaultPrimaryColor;
