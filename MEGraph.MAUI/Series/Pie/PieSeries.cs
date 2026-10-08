@@ -12,6 +12,7 @@ namespace MEGraph.MAUI.Series.Pie
     {
         public string Name { get; set; } = "PieChart";
         public bool IsVisible { get; set; } = true;
+        public string? AxisId { get; set; }
         public List<float> Data { get; set; } = new();
         public List<Color> Colors { get; set; } = new();
         public Color? Stroke { get; set; } = Color.FromArgb("#FFFFFF");

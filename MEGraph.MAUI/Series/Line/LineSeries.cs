@@ -10,8 +10,9 @@ namespace MEGraph.MAUI.Series.Line
     {
         public string Name { get; set; } = "LineSeries";
         public bool IsVisible { get; set; } = true;
+        public string? AxisId { get; set; }
         public List<float> Data { get; set; } = new();
-        public Color StrokeColor { get; set; } = Color.FromArgb("#5B9BD5");
+        public Color StrokeColor { get; set; } = Theme.ChartColors.DefaultPrimaryColor;
         public float StrokeWidth { get; set; } = 3f;
 
         // START - 2.4.0 - ADD - Smooth curved line support

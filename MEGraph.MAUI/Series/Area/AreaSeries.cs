@@ -10,8 +10,9 @@ namespace MEGraph.MAUI.Series.Area
     {
         public string Name { get; set; } = "AreaSeries";
         public bool IsVisible { get; set; } = true;
+        public string? AxisId { get; set; }
         public List<float> Data { get; set; } = new();
-        public Color StrokeColor { get; set; } = Color.FromArgb("#5B9BD5");
+        public Color StrokeColor { get; set; } = Theme.ChartColors.DefaultPrimaryColor;
         public Color? FillColor { get; set; } = Color.FromArgb("#D9E6F5");
         public float StrokeWidth { get; set; } = 3f;
 

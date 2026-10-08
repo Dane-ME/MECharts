@@ -1,4 +1,4 @@
-﻿using MEGraph.MAUI.Cores;
+using MEGraph.MAUI.Cores;
 using MEGraph.MAUI.Styles;
 using Microsoft.Maui.Graphics;
 using System;
@@ -28,6 +28,14 @@ namespace MEGraph.MAUI.Axes
         Angular,     // Trục góc
         Time,        // Trục thời gian
         Logarithmic  // Trục logarit
+    }
+
+    public enum AxisPosition
+    {
+        Left,
+        Right,
+        Bottom,
+        Top
     }
 
     public interface IAxis
@@ -62,6 +70,7 @@ namespace MEGraph.MAUI.Axes
 
         // === THUỘC TÍNH VỊ TRÍ ===
         float Position { get; set; }  // Vị trí trên trục (0-1)
+        AxisPosition AxisPosition { get; set; } // Vị trí hiển thị trục (Left, Right, Bottom, Top)
         bool IsReversed { get; set; } // Đảo ngược hướng trục
 
         // === METHODS ===

@@ -42,7 +42,14 @@ namespace MEGraph.MAUI.Cores.Components.Area.Standard.Renderers
                 }
                 else if (axis is Value valueAxis && valueAxis.Orientation == AxisOrientation.Y)
                 {
-                    left = CalculateValueAxisMargin(canvas, valueAxis, left);
+                    if (valueAxis.AxisPosition == AxisPosition.Right)
+                    {
+                        right = CalculateValueAxisMargin(canvas, valueAxis, right);
+                    }
+                    else
+                    {
+                        left = CalculateValueAxisMargin(canvas, valueAxis, left);
+                    }
                 }
             }
 

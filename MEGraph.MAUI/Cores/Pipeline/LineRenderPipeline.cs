@@ -99,10 +99,28 @@ namespace MEGraph.MAUI.Cores.Pipeline
 
             if (chart.Axes != null)
             {
-                var valueAxis = chart.Axes.FirstOrDefault(a => a.Orientation == MEGraph.MAUI.Axes.AxisOrientation.Y && (a.ChartId == chart.Id || string.IsNullOrEmpty(a.ChartId)));
-                if (valueAxis != null && valueAxis.IsAutoRange && isRangeChanged && allData.Any())
+                var yAxes = chart.Axes.Where(a => a.Orientation == MEGraph.MAUI.Axes.AxisOrientation.Y && (a.ChartId == chart.Id || string.IsNullOrEmpty(a.ChartId))).ToList();
+                var defaultYAxis = yAxes.FirstOrDefault(a => a.AxisPosition == MEGraph.MAUI.Axes.AxisPosition.Left) ?? yAxes.FirstOrDefault();
+
+                foreach (var yAxis in yAxes)
                 {
-                    valueAxis.ApplyAutoRange(dataMin, dataMax);
+                    if (!yAxis.IsAutoRange) continue;
+
+                    // Lấy các series gán vào axis này (hoặc default axis nếu series không khai AxisId)
+                    var matchedSeries = lineSeries.Where(s =>
+                        (!string.IsNullOrEmpty(s.AxisId) && s.AxisId == yAxis.Id) ||
+                        (string.IsNullOrEmpty(s.AxisId) && yAxis == defaultYAxis)
+                    ).ToList();
+
+                    if (!matchedSeries.Any()) continue;
+
+                    var axisData = matchedSeries.Where(s => s.Data != null).SelectMany(s => s.Data).ToList();
+                    if (axisData.Any())
+                    {
+                        float min = axisData.Min();
+                        float max = axisData.Max();
+                        yAxis.ApplyAutoRange(min, max);
+                    }
                 }
 
                 var categoryAxis = chart.Axes.FirstOrDefault(a => a.Orientation == MEGraph.MAUI.Axes.AxisOrientation.X && (a.ChartId == chart.Id || string.IsNullOrEmpty(a.ChartId)));
@@ -127,8 +145,13 @@ namespace MEGraph.MAUI.Cores.Pipeline
 
         public void DrawBackground(ICanvas canvas, RectF dirtyRect)
         {
-            canvas.FillColor = _chart.BackgroundColor ?? Colors.Transparent;
-            canvas.FillRectangle(dirtyRect);
+            // START - 2.6.1 - EDIT - Clear canvas and fill chart background
+            if (_chart.BackgroundColor != null && _chart.BackgroundColor != Colors.Transparent)
+            {
+                canvas.FillColor = _chart.BackgroundColor;
+                canvas.FillRectangle(dirtyRect);
+            }
+            // END - 2.6.1 - EDIT
         }
     }
 }

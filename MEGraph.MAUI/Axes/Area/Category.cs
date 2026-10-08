@@ -70,6 +70,9 @@ namespace MEGraph.MAUI.Axes.Area
                     if (stride < 1) stride = 1;
                 }
             }
+            // START - 2.6.1 - EDIT - Record current stride for gridlines sync
+            _currentStride = stride;
+            // END - 2.6.1 - EDIT
 
             for (int i = 0; i < Labels.Count; i++)
             {
@@ -129,6 +132,10 @@ namespace MEGraph.MAUI.Axes.Area
             );
         }
 
+        // START - 2.6.1 - ADD - Synchronize gridlines with label auto-skip stride
+        private int _currentStride = 1;
+        // END - 2.6.1 - ADD
+
         protected override float CalculateLabelPosition(AxisLabel label, RectF plotArea)
         {
             if (Labels?.Any() != true) return 0f;
@@ -139,6 +146,33 @@ namespace MEGraph.MAUI.Axes.Area
             float stepX = plotArea.Width / (totalCount - 1);
             return plotArea.Left + index * stepX;
         }
+
+        // START - 2.6.1 - ADD - Override DrawGridLines to only draw gridlines matching visible ticks
+        protected override void DrawGridLines(ICanvas canvas, RectF plotArea)
+        {
+            if (!ShowGridLines || Labels?.Any() != true) return;
+
+            int totalCount = TotalPoints > 0 ? TotalPoints : Labels.Count;
+            if (totalCount < 2) return;
+
+            canvas.StrokeColor = GridColor;
+            canvas.StrokeSize = GridLineWidth;
+
+            for (int i = 0; i < Labels.Count; i++)
+            {
+                if (AutoSkip && _currentStride > 1 && (i % _currentStride != 0) && (i != Labels.Count - 1))
+                {
+                    continue;
+                }
+
+                var lbl = Labels[i];
+                if (!lbl.IsVisible) continue;
+
+                float position = CalculateLabelPosition(lbl, plotArea);
+                DrawGridLine(canvas, position, plotArea);
+            }
+        }
+        // END - 2.6.1 - ADD
 
         protected override void DrawGridLine(ICanvas canvas, float position, RectF plotArea)
         {

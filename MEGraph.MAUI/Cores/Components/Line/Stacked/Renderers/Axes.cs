@@ -1,4 +1,4 @@
-﻿using MEGraph.MAUI.Axes;
+using MEGraph.MAUI.Axes;
 using MEGraph.MAUI.Axes.Line;
 using MEGraph.MAUI.Styles;
 using System;
@@ -40,7 +40,14 @@ namespace MEGraph.MAUI.Cores.Components.Line.Stacked.Renderers
                 }
                 else if (axis is Value valueAxis && valueAxis.Orientation == AxisOrientation.Y)
                 {
-                    left = CalculateValueAxisMargin(canvas, valueAxis, left);
+                    if (valueAxis.AxisPosition == AxisPosition.Right)
+                    {
+                        right = CalculateValueAxisMargin(canvas, valueAxis, right);
+                    }
+                    else
+                    {
+                        left = CalculateValueAxisMargin(canvas, valueAxis, left);
+                    }
                 }
             }
 

@@ -38,6 +38,7 @@ namespace MEGraph.MAUI.Axes
 
         // === THUỘC TÍNH VỊ TRÍ ===
         public float Position { get; set; } = 0f;
+        public AxisPosition AxisPosition { get; set; } = AxisPosition.Left;
         public bool IsReversed { get; set; } = false;
         // START - 2.1.4 - ADD - Fix the issue where axes were lost when rendering multiple charts.
         public string Id { get; set; }
@@ -69,7 +70,14 @@ namespace MEGraph.MAUI.Axes
             DrawTitle(canvas, outerArea, plotArea);
 
             if (ShowGridLines)
+            {
+                // START - 2.6.1 - ADD - Clip plotArea to prevent gridlines from leaking outside bounds
+                canvas.SaveState();
+                canvas.ClipRectangle(plotArea);
                 DrawGridLines(canvas, plotArea);
+                canvas.RestoreState();
+                // END - 2.6.1 - ADD
+            }
         }
 
         public virtual void CalculateTicks()
