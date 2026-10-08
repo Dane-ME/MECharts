@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFrameworks>net10.0-android</TargetFrameworks>
@@ -19,14 +19,14 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
 		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
-		<Version>2.4.0</Version>
+		<Version>2.7.1</Version>
 		<Authors>Dane-ME</Authors>
-		<Description>MEGraph.MAUI is a lightweight charting library for .NET MAUI (supporting .NET 8 and above). It currently provides support for three chart types: Line, Stacked Line, Area and Pie charts.</Description>
+		<Description>MEGraph.MAUI is a lightweight charting library for .NET MAUI (supporting .NET 10 and above). It currently provides support for three chart types: Line, Stacked Line, Area and Pie charts.</Description>
 		<PackageProjectUrl>https://github.com/Dane-ME/MECharts</PackageProjectUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<RepositoryUrl>https://github.com/Dane-ME/MECharts</RepositoryUrl>
 		<PackageTags>Chart</PackageTags>
-		<PackageReleaseNotes>v2.4.0: Enable Legend rendering for all chart types (Line, Area, Pie, StackedLine). Fix thread-safety in Manager. Fix duplicate min/max calculation in Series renderers.</PackageReleaseNotes>
+		<PackageReleaseNotes>v2.7.0: Optimize and add a column chart.</PackageReleaseNotes>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 	</PropertyGroup>

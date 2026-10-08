@@ -1,4 +1,4 @@
-﻿using MEGraph.MAUI.Styles;
+using MEGraph.MAUI.Styles;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -40,13 +40,16 @@ namespace MEGraph.MAUI.Axes.Pie
         {
             if (string.IsNullOrWhiteSpace(Title?.Content) || !Title.IsVisible) return;
 
-            var titleSize = canvas.GetStringSize(Title.Content, Title.Font, Title.FontSize);
+            float titleFontSize = Title.FontSize > 0 ? Title.FontSize : 14f;
+            float titleHeight = titleFontSize * 1.3f;
+            float labelMargin = Labels?.FirstOrDefault()?.Margin ?? 0f;
+            float labelHeight = (Labels?.Count > 0 ? (Labels[0].FontSize > 0 ? Labels[0].FontSize : 12f) * 1.3f : 0f);
+
             var titleArea = new RectF(
                 plotArea.Left,
-                plotArea.Bottom + Labels.FirstOrDefault()?.Margin ?? 0 +
-                (Labels?.Any() == true ? Labels.Max(l => canvas.GetStringSize(l.Content, l.Font, l.FontSize).Height + l.Margin) : 0),
+                plotArea.Bottom + labelMargin + labelHeight,
                 plotArea.Width,
-                titleSize.Height + Title.Margin
+                titleHeight + Title.Margin
             );
 
             canvas.FontSize = Title.FontSize;
@@ -120,16 +123,15 @@ namespace MEGraph.MAUI.Axes.Pie
             if (categoryAxis?.Labels.FirstOrDefault() is not AxisLabel element)
                 return (0, 0, 0, 0);
 
-            var size = canvas.GetStringSize(element.Content, element.Font, element.FontSize);
+            float elementHeight = (element.FontSize > 0 ? element.FontSize : 12f) * 1.3f;
+            float titleHeight = string.IsNullOrWhiteSpace(Title?.Content)
+                ? 0f
+                : (Title.FontSize > 0 ? Title.FontSize : 14f) * 1.3f;
 
-            var titleSize = string.IsNullOrWhiteSpace(Title?.Content)
-                ? new SizeF(0, 0)
-                : canvas.GetStringSize(Title.Content, Title.Font, Title.FontSize);
-
-            const float padding = 5;
+            const float padding = 5f;
             bottom = Math.Max(
                 bottom,
-                size.Height + element.Margin + padding + titleSize.Height + (Title?.Margin ?? 0));
+                elementHeight + element.Margin + padding + titleHeight + (Title?.Margin ?? 0));
 
             return (top, left, right, bottom);
         }

@@ -1,4 +1,4 @@
-// START - 2.4.0 - EDIT - Fix duplicate min/max: dùng GetMinY/GetMaxY từ series thay vì tính lại.
+using MEGraph.MAUI.Axes;
 using MEGraph.MAUI.Series;
 using MEGraph.MAUI.Series.Line;
 using System.Collections.Generic;
@@ -12,32 +12,56 @@ namespace MEGraph.MAUI.Cores.Components.Line.Standard.Renderers
         {
             if (baseChart == null) return;
 
-            var allLineSeries = baseChart.Series.OfType<LineSeries>().ToList();
-            var valueAxes = baseChart.Axes?.Where(a => a.Orientation == MEGraph.MAUI.Axes.AxisOrientation.Y).ToList();
-            var defaultValueAxis = valueAxes?.FirstOrDefault(a => a.AxisPosition == MEGraph.MAUI.Axes.AxisPosition.Left) 
-                                   ?? valueAxes?.FirstOrDefault();
+            IAxis? defaultValueAxis = null;
+            IAxis? categoryAxis = null;
+            int maxDataPoints = 0;
 
-            var categoryAxis = baseChart.Axes?.FirstOrDefault(a => a.Orientation == MEGraph.MAUI.Axes.AxisOrientation.X);
-            int? totalPoints = null;
-            if (categoryAxis != null && categoryAxis.TotalPoints > 0)
+            if (baseChart.Axes != null)
             {
-                totalPoints = categoryAxis.TotalPoints;
-            }
-            else if (allLineSeries.Any())
-            {
-                totalPoints = allLineSeries.Max(s => s.Data?.Count ?? 0);
+                for (int i = 0; i < baseChart.Axes.Count; i++)
+                {
+                    var a = baseChart.Axes[i];
+                    if (a.Orientation == MEGraph.MAUI.Axes.AxisOrientation.Y)
+                    {
+                        if (a.AxisPosition == MEGraph.MAUI.Axes.AxisPosition.Left || defaultValueAxis == null)
+                            defaultValueAxis = a;
+                    }
+                    else if (a.Orientation == MEGraph.MAUI.Axes.AxisOrientation.X && categoryAxis == null)
+                    {
+                        categoryAxis = a;
+                    }
+                }
             }
 
-            foreach (var series in baseChart.Series)
+            for (int i = 0; i < baseChart.Series.Count; i++)
             {
+                if (baseChart.Series[i] is LineSeries ls && ls.Data != null && ls.Data.Count > maxDataPoints)
+                    maxDataPoints = ls.Data.Count;
+            }
+
+            int? totalPoints = (categoryAxis != null && categoryAxis.TotalPoints > 0)
+                ? categoryAxis.TotalPoints
+                : (maxDataPoints > 0 ? maxDataPoints : null);
+
+            for (int i = 0; i < baseChart.Series.Count; i++)
+            {
+                var series = baseChart.Series[i];
                 if (!series.IsVisible) continue;
 
                 if (series is LineSeries lineSeries)
                 {
-                    // Tìm trục tương ứng với series (qua AxisId hoặc vị trí mặc định)
-                    var targetAxis = !string.IsNullOrEmpty(lineSeries.AxisId)
-                        ? valueAxes?.FirstOrDefault(a => a.Id == lineSeries.AxisId)
-                        : defaultValueAxis;
+                    IAxis? targetAxis = defaultValueAxis;
+                    if (!string.IsNullOrEmpty(lineSeries.AxisId) && baseChart.Axes != null)
+                    {
+                        for (int a = 0; a < baseChart.Axes.Count; a++)
+                        {
+                            if (baseChart.Axes[a].Id == lineSeries.AxisId)
+                            {
+                                targetAxis = baseChart.Axes[a];
+                                break;
+                            }
+                        }
+                    }
 
                     float? minY = targetAxis?.MinValue;
                     float? maxY = targetAxis?.MaxValue;

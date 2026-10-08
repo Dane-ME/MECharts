@@ -28,7 +28,7 @@ namespace MEGraph.MAUI.Cores
                 nameof(AnimationDuration),
                 typeof(uint),
                 typeof(BaseChart),
-                2500u
+                DeviceInfo.Platform == DevicePlatform.Android ? 400u : 1000u
             );
 
         public uint AnimationDuration
@@ -107,14 +107,15 @@ namespace MEGraph.MAUI.Cores
                 return;
             }
             AnimationProgress = 0f;
+            uint frameInterval = DeviceInfo.Platform == DevicePlatform.Android ? 30u : 16u;
             this.Animate(
                 name: "chart_entry",
                 callback: v => { AnimationProgress = (float)v; Invalidate(); },
                 start: 0d,
                 end: 1d,
-                rate: 16u,
+                rate: frameInterval,
                 length: d,
-                easing: Easing.SinInOut,
+                easing: Easing.CubicOut,
                 finished: (v, cancelled) => { AnimationProgress = 1f; Invalidate(); }
             );
         }

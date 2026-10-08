@@ -15,14 +15,15 @@ namespace MEGraph.MAUI.Legends
         {
             if (series == null) return;
 
-            // Đo width lớn nhất để xác định vị trí cột legend
-            float maxTextWidth = 0f;
+            // Ước tính width lớn nhất theo số ký tự thay vì đo từng series qua JNI mỗi frame
+            int maxChars = 0;
             var seriesList = new List<ISeries>(series);
-            foreach (var s in seriesList)
+            for (int i = 0; i < seriesList.Count; i++)
             {
-                var sz = canvas.GetStringSize(s.Name, Microsoft.Maui.Graphics.Font.Default, FontSize);
-                if (sz.Width > maxTextWidth) maxTextWidth = sz.Width;
+                var name = seriesList[i]?.Name;
+                if (name != null && name.Length > maxChars) maxChars = name.Length;
             }
+            float maxTextWidth = Math.Max(24f, maxChars * (FontSize * 0.65f));
 
             float colWidth = SwatchSize + 6f + maxTextWidth + RightPadding;
             float x = dirtyRect.Right - colWidth;

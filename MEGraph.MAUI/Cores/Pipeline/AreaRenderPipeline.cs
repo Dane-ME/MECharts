@@ -73,21 +73,33 @@ namespace MEGraph.MAUI.Cores.Pipeline
 
         private void SyncAxesWithData(BaseChart chart)
         {
-            if (chart?.Series == null || !chart.Series.Any()) return;
+            if (chart?.Series == null || chart.Series.Count == 0) return;
 
-            var areaSeries = chart.Series.OfType<AreaSeries>().Where(s => s.IsVisible).ToList();
-            if (!areaSeries.Any()) return;
+            float dataMin = float.MaxValue;
+            float dataMax = float.MinValue;
+            int maxPoints = 0;
+            bool hasData = false;
 
-            var allData = areaSeries.Where(s => s.Data != null).SelectMany(s => s.Data).ToList();
-            int maxPoints = areaSeries.Where(s => s.Data != null && s.Data.Any()).Select(s => s.Data.Count).DefaultIfEmpty(0).Max();
+            for (int i = 0; i < chart.Series.Count; i++)
+            {
+                if (chart.Series[i] is AreaSeries s && s.IsVisible && s.Data != null && s.Data.Count > 0)
+                {
+                    hasData = true;
+                    if (s.Data.Count > maxPoints) maxPoints = s.Data.Count;
+                    for (int j = 0; j < s.Data.Count; j++)
+                    {
+                        float v = s.Data[j];
+                        if (v < dataMin) dataMin = v;
+                        if (v > dataMax) dataMax = v;
+                    }
+                }
+            }
 
-            float dataMin = allData.Any() ? allData.Min() : 0f;
-            float dataMax = allData.Any() ? allData.Max() : 100f;
+            if (!hasData) return;
 
             bool isRangeChanged = Math.Abs(dataMin - _lastDataMin) > 1e-4f || Math.Abs(dataMax - _lastDataMax) > 1e-4f;
             bool isPointsChanged = maxPoints != _lastMaxPoints;
 
-            // Nếu dữ liệu không đổi (ví dụ đang trong Animation), không tính toán lại để tránh rung lắc frame
             if (!isRangeChanged && !isPointsChanged) return;
 
             _lastDataMin = dataMin;
@@ -97,7 +109,7 @@ namespace MEGraph.MAUI.Cores.Pipeline
             if (chart.Axes != null)
             {
                 var valueAxis = chart.Axes.FirstOrDefault(a => a.Orientation == MEGraph.MAUI.Axes.AxisOrientation.Y && (a.ChartId == chart.Id || string.IsNullOrEmpty(a.ChartId)));
-                if (valueAxis != null && valueAxis.IsAutoRange && isRangeChanged && allData.Any())
+                if (valueAxis != null && valueAxis.IsAutoRange && isRangeChanged && hasData)
                 {
                     valueAxis.ApplyAutoRange(dataMin, dataMax);
                 }

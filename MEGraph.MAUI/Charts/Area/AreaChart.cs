@@ -18,6 +18,8 @@ namespace MEGraph.MAUI.Charts.Area
 
         public AreaChart()
         {
+            SetRenderPipeline(new Cores.Pipeline.AreaRenderPipeline(this));
+
             SeriesList = new List<AreaSeries>();
 
             var defaultSeries = new AreaSeries();

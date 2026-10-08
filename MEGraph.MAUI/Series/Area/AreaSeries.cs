@@ -53,11 +53,13 @@ namespace MEGraph.MAUI.Series.Area
 
             canvas.Antialias = true;
 
+            float clampedProgress = Math.Clamp(progress, 0f, 1f);
             var points = new PointF[Data.Count];
             for (int i = 0; i < Data.Count; i++)
             {
                 float x = (countForStep <= 1) ? plotArea.Center.X : plotArea.Left + (i * stepX);
-                float y = plotArea.Bottom - ((Data[i] - minY) / rangeY * plotArea.Height);
+                float animatedVal = minY + (Data[i] - minY) * clampedProgress;
+                float y = plotArea.Bottom - ((animatedVal - minY) / rangeY * plotArea.Height);
                 points[i] = new PointF(x, y);
             }
 
@@ -156,14 +158,6 @@ namespace MEGraph.MAUI.Series.Area
             path.LineTo(plotArea.Left, plotArea.Bottom);
             path.Close();
 
-            bool shouldClip = progress < 1f;
-            if (shouldClip)
-            {
-                canvas.SaveState();
-                float clipWidth = Math.Max(0f, plotArea.Width * Math.Clamp(progress, 0f, 1f));
-                canvas.ClipRectangle(plotArea.Left, plotArea.Top, clipWidth, plotArea.Height);
-            }
-
             if (UseGradientFill)
             {
                 float seriesMaxY = Data.Max();
@@ -197,11 +191,6 @@ namespace MEGraph.MAUI.Series.Area
             canvas.StrokeSize = StrokeWidth;
             canvas.StrokeLineJoin = LineJoin.Round;
             canvas.DrawPath(linePath);
-
-            if (shouldClip)
-            {
-                canvas.RestoreState();
-            }
         }
 
     }

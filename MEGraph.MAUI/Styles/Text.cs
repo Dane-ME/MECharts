@@ -1,4 +1,4 @@
-﻿using Microsoft.Maui.Graphics;
+using Microsoft.Maui.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,15 +15,12 @@ namespace MEGraph.MAUI.Styles
         public float FontSize { get; set; } = 12;
         public Color FontColor { get; set; } = Colors.Black;
         public float Margin { get; set; } = 10;
+        private static readonly GraphicsFont _defaultRegular = GraphicsFont.Default;
+        private static readonly GraphicsFont _defaultBold = GraphicsFont.DefaultBold;
+
         public GraphicsFont Font
         {
-            get
-            {
-                int weight = IsBold ? 700 : 400; // 700 ~ Bold, 400 ~ Regular
-                var slant = IsItalic ? FontStyleType.Italic : FontStyleType.Normal;
-
-                return new GraphicsFont("Times New Roman", weight, slant);
-            }
+            get => IsBold ? _defaultBold : _defaultRegular;
         }
         public bool IsBold { get; set; } = false;
         public bool IsItalic { get; set; } = false;

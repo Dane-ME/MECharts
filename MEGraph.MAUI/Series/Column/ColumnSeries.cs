@@ -100,6 +100,19 @@ namespace MEGraph.MAUI.Series.Column
 
             canvas.Antialias = true;
 
+            LinearGradientPaint? sharedGradient = null;
+            if (UseGradient)
+            {
+                Color endColor = GradientEndColor ?? FillColor.WithAlpha(0.65f);
+                sharedGradient = new LinearGradientPaint
+                {
+                    StartColor = FillColor,
+                    EndColor = endColor,
+                    StartPoint = new PointF(0, 0),
+                    EndPoint = new PointF(0, 1)
+                };
+            }
+
             for (int i = 0; i < Data.Count; i++)
             {
                 float val = Data[i] * progress;
@@ -128,17 +141,9 @@ namespace MEGraph.MAUI.Series.Column
                 var barRect = new RectF(barX, barY, singleBarWidth, barHeight);
 
                 // Tô màu / Gradient
-                if (UseGradient)
+                if (sharedGradient != null)
                 {
-                    Color endColor = GradientEndColor ?? FillColor.WithAlpha(0.65f);
-                    var gradient = new LinearGradientPaint
-                    {
-                        StartColor = FillColor,
-                        EndColor = endColor,
-                        StartPoint = new PointF(0, 0),
-                        EndPoint = new PointF(0, 1)
-                    };
-                    canvas.SetFillPaint(gradient, barRect);
+                    canvas.SetFillPaint(sharedGradient, barRect);
                 }
                 else
                 {

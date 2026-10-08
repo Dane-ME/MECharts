@@ -60,46 +60,61 @@ namespace MEGraph.MAUI.Cores.Components.Line.Standard.Renderers
 
         private float CalculateCategoryAxisMargin(ICanvas canvas, Category categoryAxis, float currentBottom)
         {
-            float maxLabelHeight = 0;
-            float maxLabelMargin = 0;
+            if (categoryAxis.Labels?.Any() != true && string.IsNullOrWhiteSpace(categoryAxis.Title?.Content))
+                return currentBottom;
 
-            if (categoryAxis.Labels?.Any() == true)
+            float maxFontSize = 12f;
+            float maxLabelMargin = 4f;
+
+            if (categoryAxis.Labels != null && categoryAxis.Labels.Count > 0)
             {
-                foreach (var label in categoryAxis.Labels)
-                {
-                    var size = canvas.GetStringSize(label.Content, label.Font, label.FontSize);
-                    maxLabelHeight = Math.Max(maxLabelHeight, size.Height + label.Margin);
-                    maxLabelMargin = Math.Max(maxLabelMargin, label.Margin);
-                }
+                var first = categoryAxis.Labels[0];
+                maxFontSize = first.FontSize > 0 ? first.FontSize : 12f;
+                maxLabelMargin = first.Margin;
             }
 
-            var titleSize = string.IsNullOrWhiteSpace(categoryAxis.Title?.Content)
-                ? new SizeF(0, 0)
-                : canvas.GetStringSize(categoryAxis.Title.Content, categoryAxis.Title.Font, categoryAxis.Title.FontSize);
+            float estimatedLabelHeight = maxFontSize * 1.3f; // Ước tính chiều cao text theo font size
+            float titleHeight = string.IsNullOrWhiteSpace(categoryAxis.Title?.Content)
+                ? 0f
+                : (categoryAxis.Title.FontSize > 0 ? categoryAxis.Title.FontSize * 1.3f : 16f) + categoryAxis.Title.Margin;
 
-            float padding = 5;
-            float calculated = maxLabelHeight + maxLabelMargin + padding + titleSize.Height + categoryAxis.Title.Margin;
+            float padding = 5f;
+            float calculated = estimatedLabelHeight + maxLabelMargin + padding + titleHeight;
             return Math.Max(currentBottom, (float)Math.Ceiling(calculated));
         }
 
         private float CalculateValueAxisMargin(ICanvas canvas, Value valueAxis, float currentLeft)
         {
-            if (valueAxis.Labels?.Any() != true && string.IsNullOrWhiteSpace(valueAxis.Title.Content)) return currentLeft;
+            if (valueAxis.Labels?.Any() != true && string.IsNullOrWhiteSpace(valueAxis.Title?.Content)) return currentLeft;
 
-            // Tính toán width của labels
-            float maxWidth = 0;
-            foreach (var label in valueAxis.Labels)
+            // Ước lượng width lớn nhất theo số ký tự dài nhất thay vì đo từng label qua JNI
+            int maxChars = 0;
+            float fontSize = 12f;
+            float labelMargin = 6f;
+
+            if (valueAxis.Labels != null)
             {
-                var size = canvas.GetStringSize(label.Content, label.Font, label.FontSize);
-                maxWidth = Math.Max(maxWidth, size.Width + label.Margin);
+                foreach (var label in valueAxis.Labels)
+                {
+                    if (label.Content != null && label.Content.Length > maxChars)
+                        maxChars = label.Content.Length;
+                }
+
+                if (valueAxis.Labels.Count > 0)
+                {
+                    fontSize = valueAxis.Labels[0].FontSize > 0 ? valueAxis.Labels[0].FontSize : 12f;
+                    labelMargin = valueAxis.Labels[0].Margin;
+                }
             }
 
-            // Tính toán height của title (vì Y-axis title được rotate)
-            var titleSize = string.IsNullOrWhiteSpace(valueAxis.Title?.Content)
-                ? new SizeF(0, 0)
-                : canvas.GetStringSize(valueAxis.Title.Content, valueAxis.Title.Font, valueAxis.Title.FontSize);
+            // Mỗi ký tự font bình thường rộng xấp xỉ 0.6 * fontSize
+            float estimatedMaxWidth = Math.Max(20f, maxChars * (fontSize * 0.65f)) + labelMargin;
 
-            float calculated = maxWidth + 10 + titleSize.Height;
+            float titleHeight = string.IsNullOrWhiteSpace(valueAxis.Title?.Content)
+                ? 0f
+                : (valueAxis.Title.FontSize > 0 ? valueAxis.Title.FontSize * 1.3f : 16f) + valueAxis.Title.Margin;
+
+            float calculated = estimatedMaxWidth + 10f + titleHeight;
             return Math.Max(currentLeft, (float)Math.Ceiling(calculated));
         }
     }

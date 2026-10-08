@@ -76,21 +76,33 @@ namespace MEGraph.MAUI.Cores.Pipeline
 
         private void SyncAxesWithData(BaseChart chart)
         {
-            if (chart?.Series == null || !chart.Series.Any()) return;
+            if (chart?.Series == null || chart.Series.Count == 0) return;
 
-            var lineSeries = chart.Series.OfType<LineSeries>().Where(s => s.IsVisible).ToList();
-            if (!lineSeries.Any()) return;
+            float dataMin = float.MaxValue;
+            float dataMax = float.MinValue;
+            int maxPoints = 0;
+            bool hasData = false;
 
-            var allData = lineSeries.Where(s => s.Data != null).SelectMany(s => s.Data).ToList();
-            int maxPoints = lineSeries.Where(s => s.Data != null && s.Data.Any()).Select(s => s.Data.Count).DefaultIfEmpty(0).Max();
+            for (int i = 0; i < chart.Series.Count; i++)
+            {
+                if (chart.Series[i] is LineSeries ls && ls.IsVisible && ls.Data != null && ls.Data.Count > 0)
+                {
+                    hasData = true;
+                    if (ls.Data.Count > maxPoints) maxPoints = ls.Data.Count;
+                    for (int j = 0; j < ls.Data.Count; j++)
+                    {
+                        float v = ls.Data[j];
+                        if (v < dataMin) dataMin = v;
+                        if (v > dataMax) dataMax = v;
+                    }
+                }
+            }
 
-            float dataMin = allData.Any() ? allData.Min() : 0f;
-            float dataMax = allData.Any() ? allData.Max() : 100f;
+            if (!hasData) return;
 
             bool isRangeChanged = Math.Abs(dataMin - _lastDataMin) > 1e-4f || Math.Abs(dataMax - _lastDataMax) > 1e-4f;
             bool isPointsChanged = maxPoints != _lastMaxPoints;
 
-            // Nếu dữ liệu không đổi (ví dụ đang trong Animation), không tính toán lại để tránh rung lắc frame
             if (!isRangeChanged && !isPointsChanged) return;
 
             _lastDataMin = dataMin;
@@ -106,20 +118,32 @@ namespace MEGraph.MAUI.Cores.Pipeline
                 {
                     if (!yAxis.IsAutoRange) continue;
 
-                    // Lấy các series gán vào axis này (hoặc default axis nếu series không khai AxisId)
-                    var matchedSeries = lineSeries.Where(s =>
-                        (!string.IsNullOrEmpty(s.AxisId) && s.AxisId == yAxis.Id) ||
-                        (string.IsNullOrEmpty(s.AxisId) && yAxis == defaultYAxis)
-                    ).ToList();
+                    float axisMin = float.MaxValue;
+                    float axisMax = float.MinValue;
+                    bool hasAxisData = false;
 
-                    if (!matchedSeries.Any()) continue;
-
-                    var axisData = matchedSeries.Where(s => s.Data != null).SelectMany(s => s.Data).ToList();
-                    if (axisData.Any())
+                    for (int i = 0; i < chart.Series.Count; i++)
                     {
-                        float min = axisData.Min();
-                        float max = axisData.Max();
-                        yAxis.ApplyAutoRange(min, max);
+                        if (chart.Series[i] is LineSeries s && s.IsVisible && s.Data != null)
+                        {
+                            bool isMatch = (!string.IsNullOrEmpty(s.AxisId) && s.AxisId == yAxis.Id) ||
+                                           (string.IsNullOrEmpty(s.AxisId) && yAxis == defaultYAxis);
+                            if (isMatch)
+                            {
+                                for (int j = 0; j < s.Data.Count; j++)
+                                {
+                                    hasAxisData = true;
+                                    float val = s.Data[j];
+                                    if (val < axisMin) axisMin = val;
+                                    if (val > axisMax) axisMax = val;
+                                }
+                            }
+                        }
+                    }
+
+                    if (hasAxisData)
+                    {
+                        yAxis.ApplyAutoRange(axisMin, axisMax);
                     }
                 }
 

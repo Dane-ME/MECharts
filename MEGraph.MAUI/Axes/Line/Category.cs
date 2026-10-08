@@ -28,23 +28,12 @@ namespace MEGraph.MAUI.Axes.Line
         protected override void DrawLabels(ICanvas canvas, RectF plotArea)
         {
             if (Labels?.Any() != true) return;
-            float maxLabelHeight = 0;
-            float maxLabelWidth = 0;
-            foreach (var lbl in Labels)
-            {
-                var size = canvas.GetStringSize(lbl.Content, lbl.Font, lbl.FontSize);
-                maxLabelHeight = Math.Max(maxLabelHeight, size.Height + lbl.Margin);
-                maxLabelWidth = Math.Max(maxLabelWidth, size.Width + lbl.Margin);
-            }
-            float labelMargin = Labels.FirstOrDefault()?.Margin ?? 4f;
+
+            float fontSize = Labels[0].FontSize > 0 ? Labels[0].FontSize : 12f;
+            float maxLabelHeight = fontSize * 1.3f;
+            float labelMargin = Labels[0].Margin;
             float labelTop = (float)Math.Round(plotArea.Bottom + labelMargin);
             float labelCenterY = (float)Math.Round(labelTop + maxLabelHeight / 2f);
-            var labelArea = new RectF(
-                plotArea.Left, 
-                labelTop, 
-                plotArea.Width, 
-                maxLabelHeight
-                );
 
             int totalCount = TotalPoints > 0 ? TotalPoints : Labels.Count;
             if (totalCount < 2)
@@ -62,18 +51,25 @@ namespace MEGraph.MAUI.Axes.Line
             float stepX = plotArea.Width / (totalCount - 1);
 
             int stride = 1;
-            if (AutoSkip && maxLabelWidth > 0)
+            if (AutoSkip)
             {
-                float minSpacing = maxLabelWidth + 8f;
+                // Ước tính chiều rộng nhãn dài nhất: maxChars * (fontSize * 0.65f)
+                int maxChars = 0;
+                for (int i = 0; i < Labels.Count; i++)
+                {
+                    if (Labels[i].Content != null && Labels[i].Content.Length > maxChars)
+                        maxChars = Labels[i].Content.Length;
+                }
+                float estimatedMaxLabelWidth = Math.Max(16f, maxChars * (fontSize * 0.65f));
+                float minSpacing = estimatedMaxLabelWidth + 8f;
                 if (stepX < minSpacing)
                 {
                     stride = (int)Math.Ceiling(minSpacing / stepX);
                     if (stride < 1) stride = 1;
                 }
             }
-            // START - 2.6.1 - EDIT - Record current stride for gridlines sync
+
             _currentStride = stride;
-            // END - 2.6.1 - EDIT
 
             for (int i = 0; i < Labels.Count; i++)
             {
@@ -109,16 +105,19 @@ namespace MEGraph.MAUI.Axes.Line
         {
             if (string.IsNullOrWhiteSpace(Title?.Content) || !Title.IsVisible) return;
 
-            var titleSize = canvas.GetStringSize(Title.Content, Title.Font, Title.FontSize);
+            float labelFontSize = (Labels?.Count > 0 && Labels[0].FontSize > 0) ? Labels[0].FontSize : 12f;
             float labelBottomOffset = (Labels?.Any() == true)
-                ? (Labels.Max(l => canvas.GetStringSize(l.Content, l.Font, l.FontSize).Height + l.Margin) + (Labels.FirstOrDefault()?.Margin ?? 0))
+                ? (labelFontSize * 1.3f + (Labels[0].Margin * 2f))
                 : 0f;
+
+            float titleFontSize = Title.FontSize > 0 ? Title.FontSize : 14f;
+            float titleHeight = titleFontSize * 1.3f;
 
             var titleArea = new RectF(
                 plotArea.Left,
                 (float)Math.Round(plotArea.Bottom + labelBottomOffset),
                 plotArea.Width,
-                titleSize.Height + Title.Margin
+                titleHeight + Title.Margin
             );
 
             canvas.FontSize = Title.FontSize;
